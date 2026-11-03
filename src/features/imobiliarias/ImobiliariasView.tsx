@@ -119,7 +119,7 @@ export const ImobiliariasView: React.FC = () => {
       {/* Top Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-gray-200 shadow-xs">
         <div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-2xl font-black text-gray-900 tracking-tight">Leads & Imobiliárias</h1>
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
               <span
@@ -131,9 +131,12 @@ export const ImobiliariasView: React.FC = () => {
                 {config?.status === 'conectado' ? 'CVCRM Conectado' : 'Aguardando Token CVCRM'}
               </span>
             </div>
+            <div className="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
+              Fila: DISTRIBUIÇÃO DE LEAS FACEBOOK - TOP 5 IMOB
+            </div>
           </div>
           <p className="text-sm text-gray-500 mt-1">
-            Painel analítico de distribuição de leads, funil de atendimento e conversão em vendas (via API CVCRM)
+            Painel analítico exclusivo: Leads de <strong>Facebook e Instagram</strong> distribuídos para as imobiliárias da fila
           </p>
         </div>
 
@@ -387,7 +390,18 @@ export const ImobiliariasView: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <Building2 className="w-4 h-4 text-gray-400 shrink-0" />
                         <div>
-                          <span>{row.agency.name}</span>
+                          <div className="flex items-center gap-1.5">
+                            <span>{row.agency.name}</span>
+                            {row.agency.notes && (
+                              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-sm ${
+                                row.agency.notes.includes('Próximo')
+                                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                  : 'bg-gray-100 text-gray-700'
+                              }`}>
+                                {row.agency.notes}
+                              </span>
+                            )}
+                          </div>
                           {row.agency.cvcrm_id && (
                             <span className="block text-[10px] text-gray-400 font-mono">
                               ID CVCRM: {row.agency.cvcrm_id}
