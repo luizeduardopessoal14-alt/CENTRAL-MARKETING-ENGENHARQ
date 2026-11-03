@@ -104,7 +104,6 @@ export const FinancialTable: React.FC<FinancialTableProps> = ({
                     </div>
                     <div className="flex items-center gap-2 mt-0.5 text-[10px] text-gray-400">
                       {r.invoice_number && <span>NF: {r.invoice_number}</span>}
-                      {r.authorized_by && <span>Autorizado: {r.authorized_by}</span>}
                     </div>
                   </td>
 

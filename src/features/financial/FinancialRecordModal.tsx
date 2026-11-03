@@ -251,32 +251,18 @@ export const FinancialRecordModal: React.FC<FinancialRecordModalProps> = ({
             </div>
           </div>
 
-          {/* Autorizado por e Número da Nota */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
-                Autorizado por (Opcional)
-              </label>
-              <input
-                type="text"
-                placeholder="Ex: Flávia / Hugo / Adriano"
-                value={authorizedBy}
-                onChange={(e) => setAuthorizedBy(e.target.value)}
-                className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE3A39]"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
-                Número da Nota / Doc (Opcional)
-              </label>
-              <input
-                type="text"
-                placeholder="Ex: NF-e 10425"
-                value={invoiceNumber}
-                onChange={(e) => setInvoiceNumber(e.target.value)}
-                className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE3A39]"
-              />
-            </div>
+          {/* Número da Nota */}
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+              Número da Nota / Documento (Opcional)
+            </label>
+            <input
+              type="text"
+              placeholder="Ex: NF-e 10425"
+              value={invoiceNumber}
+              onChange={(e) => setInvoiceNumber(e.target.value)}
+              className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE3A39]"
+            />
           </div>
 
           {/* Upload de Anexo */}
