@@ -40,3 +40,4 @@ export interface AuditLogItem {
   details: Record<string, unknown>;
   created_at: string;
 }
+

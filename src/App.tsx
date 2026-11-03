@@ -5,6 +5,7 @@ import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { OverviewView } from './features/overview/OverviewView';
 import { AdminView } from './features/admin/AdminView';
+import { FinanceiroView } from './features/financial/FinanceiroView';
 import { ModulePlaceholder } from './features/placeholders/ModulePlaceholder';
 import { AppArea } from './types/auth';
 import { ShieldAlert } from 'lucide-react';
@@ -70,13 +71,7 @@ const MainLayout: React.FC = () => {
           ) : currentTab === 'admin' ? (
             <AdminView />
           ) : currentTab === 'financeiro' ? (
-            <ModulePlaceholder
-              area="financeiro"
-              stepNumber={2}
-              title="Módulo Financeiro"
-              description="Cadastro de notas e cobranças, acompanhamento de situações (A encaminhar, Aguardando previsão, Pagamento previsto e Pago), histórico de mudanças e lixeira."
-              onBack={() => setCurrentTab('visao_geral')}
-            />
+            <FinanceiroView />
           ) : currentTab === 'conteudos' ? (
             <ModulePlaceholder
               area="conteudos"
@@ -133,3 +128,4 @@ export function App() {
 }
 
 export default App;
+

@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { AppArea } from '../../types/auth';
+import { FinancialTotals } from '../../types/financeiro';
+import { financialService } from '../../services/financialService';
 import {
   DollarSign,
   Kanban,
@@ -16,6 +18,25 @@ interface OverviewViewProps {
 
 export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
   const { hasAccess } = useAuth();
+  const [financialTotals, setFinancialTotals] = useState<FinancialTotals>({
+    totalOpen: 0,
+    totalNoForecast: 0,
+    totalWeekForecast: 0,
+    totalPaidMonth: 0,
+    countConsultFinance: 0,
+  });
+
+  useEffect(() => {
+    if (hasAccess('financeiro', 'consulta')) {
+      financialService
+        .getTotals()
+        .then(setFinancialTotals)
+        .catch((err) => console.error('Erro ao buscar totais financeiros na visão geral:', err));
+    }
+  }, [hasAccess]);
+
+  const formatCurrency = (val: number) =>
+    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
@@ -59,15 +80,21 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
               <div className="space-y-2">
                 <div className="flex justify-between items-baseline">
                   <span className="text-xs text-gray-500">Em aberto (geral):</span>
-                  <span className="text-sm font-bold text-[#373535]">R$ 0,00</span>
+                  <span className="text-sm font-bold text-[#373535]">
+                    {formatCurrency(financialTotals.totalOpen)}
+                  </span>
                 </div>
                 <div className="flex justify-between items-baseline">
-                  <span className="text-xs text-gray-500">Aguardando previsão:</span>
-                  <span className="text-xs font-semibold text-amber-600">0 cobranças</span>
+                  <span className="text-xs text-gray-500">Sem previsão:</span>
+                  <span className="text-xs font-semibold text-amber-600">
+                    {formatCurrency(financialTotals.totalNoForecast)}
+                  </span>
                 </div>
                 <div className="flex justify-between items-baseline">
                   <span className="text-xs text-gray-500">Pago no mês:</span>
-                  <span className="text-xs font-semibold text-emerald-600">R$ 0,00</span>
+                  <span className="text-xs font-semibold text-emerald-600">
+                    {formatCurrency(financialTotals.totalPaidMonth)}
+                  </span>
                 </div>
               </div>
             </div>
