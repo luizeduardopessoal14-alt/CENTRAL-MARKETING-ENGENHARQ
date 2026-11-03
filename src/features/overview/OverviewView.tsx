@@ -10,7 +10,7 @@ import { imobiliariaService } from '../../services/imobiliariaService';
 import { calculateDueDateAlert } from '../../types/conteudos';
 import { CalendarOverviewMetrics } from '../../types/calendario';
 import { MetaIntegrationConfig, MetaOverviewTotals } from '../../types/midia';
-import { CVCRMIntegrationConfig } from '../../types/imobiliarias';
+import { CVCRMIntegrationConfig, AgencyMetricsMonthly } from '../../types/imobiliarias';
 import {
   DollarSign,
   Kanban,
@@ -107,9 +107,9 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
 
     if (hasAccess('imobiliarias', 'consulta')) {
       imobiliariaService.getConfig().then(setCvcrmConfig);
-      imobiliariaService.getMonthlyMetrics().then((metrics) => {
-        const leads = metrics.reduce((sum, m) => sum + m.leads_received, 0);
-        const sales = metrics.reduce((sum, m) => sum + m.sales, 0);
+      imobiliariaService.getMonthlyMetrics().then((metrics: AgencyMetricsMonthly[]) => {
+        const leads = metrics.reduce((sum: number, m: AgencyMetricsMonthly) => sum + m.leads_received, 0);
+        const sales = metrics.reduce((sum: number, m: AgencyMetricsMonthly) => sum + m.sales, 0);
         const conversionRate = leads > 0 ? (sales / leads) * 100 : 0;
         setImobiliariaTotals({ leads, sales, conversionRate });
       });

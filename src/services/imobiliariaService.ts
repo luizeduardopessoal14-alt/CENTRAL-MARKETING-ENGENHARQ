@@ -2,6 +2,7 @@ import { supabase } from '../lib/supabase';
 import {
   CVCRMIntegrationConfig,
   RealEstateAgency,
+  CVCRMLeadItem,
   AgencyMetricsMonthly,
 } from '../types/imobiliarias';
 
@@ -59,7 +60,7 @@ export const imobiliariaService = {
     return { success: true };
   },
 
-  // 2. Imobiliárias Parceiras (Somente as da fila TOP 5)
+  // 2. Imobiliárias Parceiras da Fila TOP 5
   async getAgencies(): Promise<RealEstateAgency[]> {
     const { data, error } = await supabase
       .from('real_estate_agencies')
@@ -99,6 +100,34 @@ export const imobiliariaService = {
           ? Math.round((row.sales / row.leads_received) * 10000) / 100
           : 0,
     }));
+  },
+
+  // 4. Buscar Leads com Filtro de Data Flexível (Data A até Data B ou Todo o Período)
+  async getFilteredLeads(filters: {
+    startDate?: string; // 'YYYY-MM-DD'
+    endDate?: string;   // 'YYYY-MM-DD'
+    agencyId?: string;
+  }): Promise<CVCRMLeadItem[]> {
+    let query = supabase.from('cvcrm_leads_cache').select('*');
+
+    if (filters.startDate) {
+      query = query.gte('data_cad', `${filters.startDate}T00:00:00-03:00`);
+    }
+    if (filters.endDate) {
+      query = query.lte('data_cad', `${filters.endDate}T23:59:59-03:00`);
+    }
+    if (filters.agencyId && filters.agencyId !== 'all') {
+      query = query.eq('agency_id', filters.agencyId);
+    }
+
+    query = query.order('data_cad', { ascending: false });
+
+    const { data, error } = await query;
+    if (error) {
+      console.warn('Tabela cvcrm_leads_cache não encontrada ou vazia:', error.message);
+      return [];
+    }
+    return data || [];
   },
 
   // 4. Sincronização Estrita da Fila de Distribuição: "DISTRIBUIÇÃO DE LEAS FACEBOOK - TOP 5 IMOB"
@@ -179,7 +208,7 @@ export const imobiliariaService = {
       const { data: dbAgencies } = await supabase.from('real_estate_agencies').select('id, cvcrm_id');
       const agencyDbMap = new Map((dbAgencies || []).map((a) => [a.cvcrm_id, a.id]));
 
-      // 2. Buscar leads e filtrar estritamente Facebook / Instagram da Fila
+      // 2. Buscar leads da API do CVCRM (buscando página com lote maior)
       const leadsUrl = `${config.base_url.replace(/\/$/, '')}/api/v1/comercial/leads?limit=500`;
       const leadsRes = await fetch(leadsUrl, { headers });
       if (!leadsRes.ok) {
@@ -187,33 +216,25 @@ export const imobiliariaService = {
       }
 
       const leadsJson = await leadsRes.json();
-      const leads: Array<{
+      const rawLeads: Array<{
+        idlead: number;
         imobiliaria?: { id: number; nome: string };
         data_cad?: string;
         origem?: string;
         midia_principal?: string;
         midias?: string[];
-        situacao?: { nome: string };
+        situacao?: { id?: number; nome?: string };
         qtde_simulacoes_associadas?: number;
         qtde_reservas_associadas?: number;
       }> = leadsJson.leads || [];
 
-      interface MetricAggregate {
-        agency_id: string;
-        period_month: string;
-        leads_received: number;
-        in_attendance: number;
-        visits: number;
-        proposals: number;
-        sales: number;
-      }
-      const metricsAgg: Record<string, MetricAggregate> = {};
-      let totalFilteredLeads = 0;
+      // Filtrar estritamente Facebook / Instagram da Fila
+      const leadsToCache: CVCRMLeadItem[] = [];
 
-      for (const l of leads) {
-        if (!l.imobiliaria?.id || !l.data_cad) continue;
+      for (const l of rawLeads) {
+        if (!l.idlead || !l.imobiliaria?.id || !l.data_cad) continue;
         const cvId = String(l.imobiliaria.id);
-        if (!allowedCvIds.includes(cvId)) continue; // Ignora imobiliárias fora da fila
+        if (!allowedCvIds.includes(cvId)) continue; // Apenas imobiliárias da fila
 
         const orig = (l.origem || '').toLowerCase();
         const mid = (l.midia_principal || '').toLowerCase();
@@ -230,61 +251,38 @@ export const imobiliariaService = {
           mids.includes('facebook') ||
           mids.includes('instagram');
 
-        if (!isMeta) continue; // Ignora leads que não sejam Facebook / Instagram
+        if (!isMeta) continue; // Apenas leads de Facebook / Instagram
 
-        totalFilteredLeads++;
         const agencyId = agencyDbMap.get(cvId);
         if (!agencyId) continue;
 
-        const month = `${l.data_cad.substring(0, 7)}-01`;
-        const key = `${agencyId}_${month}`;
+        leadsToCache.push({
+          idlead: l.idlead,
+          agency_id: agencyId,
+          agency_name: l.imobiliaria.nome,
+          agency_cvcrm_id: cvId,
+          data_cad: l.data_cad.replace(' ', 'T') + '-03:00',
+          situacao_id: l.situacao?.id || null,
+          situacao_nome: l.situacao?.nome?.trim() || 'Aguardando Atendimento',
+          origem: l.origem || 'Facebook',
+          midia_principal: l.midia_principal || 'Facebook',
+          qtde_simulacoes: l.qtde_simulacoes_associadas || 0,
+          qtde_reservas: l.qtde_reservas_associadas || 0,
+        });
+      }
 
-        if (!metricsAgg[key]) {
-          metricsAgg[key] = {
-            agency_id: agencyId,
-            period_month: month,
-            leads_received: 0,
-            in_attendance: 0,
-            visits: 0,
-            proposals: 0,
-            sales: 0,
-          };
-        }
+      // Salvar em lote no cache do banco para consultas ultra-rápidas
+      if (leadsToCache.length > 0) {
+        const { error: upsertErr } = await supabase
+          .from('cvcrm_leads_cache')
+          .upsert(leadsToCache, { onConflict: 'idlead' });
 
-        const m = metricsAgg[key];
-        m.leads_received++;
-
-        const sit = (l.situacao?.nome || '').toLowerCase();
-        if (sit.includes('atendimento') || sit.includes('contato')) {
-          m.in_attendance++;
-        }
-        if (sit.includes('visita')) {
-          m.visits++;
-        }
-        if ((l.qtde_simulacoes_associadas || 0) > 0 || sit.includes('simulação') || sit.includes('proposta')) {
-          m.proposals++;
-        }
-        if (sit.includes('reserva') || sit.includes('venda') || sit.includes('ganho') || (l.qtde_reservas_associadas || 0) > 0) {
-          m.sales++;
+        if (upsertErr) {
+          console.warn('Aviso ao atualizar cvcrm_leads_cache:', upsertErr.message);
         }
       }
 
-      // Limpar métricas de imobiliárias antigas/fora da fila
-      const dbIds = (dbAgencies || []).map((a) => a.id);
-      if (dbIds.length > 0) {
-        await supabase
-          .from('agency_metrics_monthly')
-          .delete()
-          .not('agency_id', 'in', `(${dbIds.join(',')})`);
-      }
-
-      // Upsert das métricas consolidadas da fila
-      for (const item of Object.values(metricsAgg)) {
-        await supabase
-          .from('agency_metrics_monthly')
-          .upsert(item, { onConflict: 'agency_id,period_month' });
-      }
-
+      // Atualizar status e última sincronização
       await supabase
         .from('cvcrm_integration_config')
         .update({
@@ -298,7 +296,7 @@ export const imobiliariaService = {
         success: true,
         message: 'Fila "DISTRIBUIÇÃO DE LEAS FACEBOOK - TOP 5 IMOB" sincronizada com sucesso!',
         agenciesCount: allowedAgencies.length,
-        leadsCount: totalFilteredLeads,
+        leadsCount: leadsToCache.length,
       };
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : String(err);

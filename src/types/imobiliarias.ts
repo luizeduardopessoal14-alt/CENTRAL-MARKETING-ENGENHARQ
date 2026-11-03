@@ -30,27 +30,53 @@ export interface RealEstateAgency {
 export interface AgencyMetricsMonthly {
   id: string;
   agency_id: string;
-  period_month: string; // 'YYYY-MM-01'
+  period_month: string;
   leads_received: number;
   in_attendance: number;
   visits: number;
   proposals: number;
   sales: number;
-  conversion_rate?: number; // Calculated: (sales / leads_received) * 100
+  conversion_rate?: number;
   synced_at: string;
   created_at: string;
   updated_at: string;
   agency?: RealEstateAgency;
 }
 
-export interface AgencySummaryRow {
-  agency: RealEstateAgency;
-  leads_received: number;
-  in_attendance: number;
-  visits: number;
-  proposals: number;
-  sales: number;
-  conversion_rate: number;
-  visits_rate: number;
+export interface CVCRMLeadItem {
+  idlead: number;
+  agency_id: string;
+  agency_name: string;
+  agency_cvcrm_id: string;
+  data_cad: string;
+  situacao_id: number | null;
+  situacao_nome: string;
+  origem: string | null;
+  midia_principal: string | null;
+  qtde_simulacoes: number;
+  qtde_reservas: number;
 }
 
+export interface EsteiraMetric {
+  nome: string;
+  count: number;
+  percentage: number;
+  isWonStage: boolean; // ex: 'Com Reserva' / 'Venda'
+  isLostStage: boolean; // ex: 'Congela' / 'Perdido'
+}
+
+export interface AgencyEsteiraRow {
+  agency: RealEstateAgency;
+  total_leads: number;
+  esteiras: Record<string, number>;
+  reservas_vendas: number;
+  conversion_rate: number;
+}
+
+export type PeriodFilterMode =
+  | 'este_mes'
+  | 'mes_passado'
+  | 'ultimos_30'
+  | 'ultimos_90'
+  | 'todo_periodo'
+  | 'personalizado';
