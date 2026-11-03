@@ -4,7 +4,9 @@ import { AppArea } from '../../types/auth';
 import { FinancialTotals } from '../../types/financeiro';
 import { financialService } from '../../services/financialService';
 import { contentService } from '../../services/contentService';
+import { calendarService } from '../../services/calendarService';
 import { calculateDueDateAlert } from '../../types/conteudos';
+import { CalendarOverviewMetrics } from '../../types/calendario';
 import {
   DollarSign,
   Kanban,
@@ -34,6 +36,12 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
     overdueCount: 0,
   });
 
+  const [calendarMetrics, setCalendarMetrics] = useState<CalendarOverviewMetrics>({
+    nextEvents: [],
+    meetingsThisWeekCount: 0,
+    eventsThisMonthCount: 0,
+  });
+
   useEffect(() => {
     if (hasAccess('financeiro', 'consulta')) {
       financialService
@@ -59,6 +67,10 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
           setContentTotals({ inProduction, inApproval, overdueCount });
         }
       });
+    }
+
+    if (hasAccess('calendario', 'consulta')) {
+      calendarService.getOverviewMetrics().then(setCalendarMetrics);
     }
   }, [hasAccess]);
 
@@ -200,16 +212,24 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between items-baseline">
-                  <span className="text-xs text-gray-500">Próximos compromissos:</span>
-                  <span className="text-sm font-bold text-[#373535]">-</span>
+                  <span className="text-xs text-gray-500">Próximo compromisso:</span>
+                  <span className="text-xs font-bold text-[#373535] truncate max-w-[170px]" title={calendarMetrics.nextEvents[0]?.title}>
+                    {calendarMetrics.nextEvents.length > 0
+                      ? `${calendarMetrics.nextEvents[0].title} (${calendarMetrics.nextEvents[0].event_date.split('-').reverse().slice(0, 2).join('/')})`
+                      : 'Nenhum agendado'}
+                  </span>
                 </div>
                 <div className="flex justify-between items-baseline">
                   <span className="text-xs text-gray-500">Reuniões esta semana:</span>
-                  <span className="text-xs font-semibold text-gray-600">-</span>
+                  <span className="text-xs font-semibold text-blue-600">
+                    {calendarMetrics.meetingsThisWeekCount}
+                  </span>
                 </div>
                 <div className="flex justify-between items-baseline">
-                  <span className="text-xs text-gray-500">Eventos do mês:</span>
-                  <span className="text-xs font-semibold text-gray-600">-</span>
+                  <span className="text-xs text-gray-500">Eventos no mês:</span>
+                  <span className="text-xs font-semibold text-[#DE3A39]">
+                    {calendarMetrics.eventsThisMonthCount}
+                  </span>
                 </div>
               </div>
             </div>

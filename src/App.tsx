@@ -7,6 +7,7 @@ import { OverviewView } from './features/overview/OverviewView';
 import { AdminView } from './features/admin/AdminView';
 import { FinanceiroView } from './features/financial/FinanceiroView';
 import { ConteudosView } from './features/conteudos/ConteudosView';
+import { CalendarioView } from './features/calendario/CalendarioView';
 import { ModulePlaceholder } from './features/placeholders/ModulePlaceholder';
 import { AppArea } from './types/auth';
 import { ShieldAlert } from 'lucide-react';
@@ -76,13 +77,7 @@ const MainLayout: React.FC = () => {
           ) : currentTab === 'conteudos' ? (
             <ConteudosView />
           ) : currentTab === 'calendario' ? (
-            <ModulePlaceholder
-              area="calendario"
-              stepNumber={4}
-              title="Calendário Geral de Reuniões e Eventos"
-              description="Agenda compartilhada da construtora para alinhamentos estratégicos e eventos de lançamento."
-              onBack={() => setCurrentTab('visao_geral')}
-            />
+            <CalendarioView />
           ) : currentTab === 'midia' ? (
             <ModulePlaceholder
               area="midia"
