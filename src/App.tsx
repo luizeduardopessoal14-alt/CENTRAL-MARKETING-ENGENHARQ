@@ -6,6 +6,7 @@ import { Header } from './components/layout/Header';
 import { OverviewView } from './features/overview/OverviewView';
 import { AdminView } from './features/admin/AdminView';
 import { FinanceiroView } from './features/financial/FinanceiroView';
+import { ConteudosView } from './features/conteudos/ConteudosView';
 import { ModulePlaceholder } from './features/placeholders/ModulePlaceholder';
 import { AppArea } from './types/auth';
 import { ShieldAlert } from 'lucide-react';
@@ -61,7 +62,7 @@ const MainLayout: React.FC = () => {
               </p>
               <button
                 onClick={() => setCurrentTab('visao_geral')}
-                className="mt-4 px-4 py-2 bg-gray-900 text-white rounded-lg text-xs font-semibold hover:bg-gray-800 transition-colors"
+                className="mt-4 px-4 py-2 bg-gray-900 text-white rounded-lg text-xs font-semibold hover:bg-gray-800 transition-colors cursor-pointer"
               >
                 Voltar à Visão Geral
               </button>
@@ -73,13 +74,7 @@ const MainLayout: React.FC = () => {
           ) : currentTab === 'financeiro' ? (
             <FinanceiroView />
           ) : currentTab === 'conteudos' ? (
-            <ModulePlaceholder
-              area="conteudos"
-              stepNumber={3}
-              title="Quadro Kanban de Conteúdos"
-              description="Acompanhamento de pautas e produção para redes sociais com arraste persistente, alertas de prazo (amanhã, hoje, atrasado) e aprovação de marketing."
-              onBack={() => setCurrentTab('visao_geral')}
-            />
+            <ConteudosView />
           ) : currentTab === 'calendario' ? (
             <ModulePlaceholder
               area="calendario"
@@ -128,4 +123,3 @@ export function App() {
 }
 
 export default App;
-

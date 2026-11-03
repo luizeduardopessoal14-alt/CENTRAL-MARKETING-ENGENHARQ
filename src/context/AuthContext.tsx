@@ -159,33 +159,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { success: false, error: 'Informe o nome de usuário e a senha.' };
       }
 
-      // 1. Resolver identificador seguro no backend
-      const { data: identifier, error: rpcError } = await supabase.rpc(
-        'resolve_login_identifier',
-        { p_username: cleanUsername }
-      );
+      let emailToAuth: string | null = null;
 
-      if (rpcError || !identifier) {
-        console.error('Erro na resolução de identificador:', rpcError);
+      // Se o usuário digitou um email diretamente
+      if (cleanUsername.includes('@')) {
+        emailToAuth = cleanUsername;
+      } else {
+        // 1. Resolver identificador seguro no backend pelo nome de usuário
+        const { data: identifier, error: rpcError } = await supabase.rpc(
+          'resolve_login_identifier',
+          { p_username: cleanUsername }
+        );
+
+        if (rpcError) {
+          console.error('Erro RPC resolve_login_identifier:', rpcError);
+          const isNetworkError = rpcError.message?.toLowerCase().includes('fetch') || 
+                                 rpcError.message?.toLowerCase().includes('network');
+          if (isNetworkError) {
+            return { success: false, error: 'Falha de conexão com o servidor. Verifique a internet e tente novamente.' };
+          }
+        }
+
+        emailToAuth = identifier;
+      }
+
+      if (!emailToAuth) {
         return { success: false, error: 'Nome de usuário ou senha incorretos.' };
       }
 
       // 2. Autenticar com o Supabase Auth oficial
       const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email: identifier,
+        email: emailToAuth,
         password,
       });
 
       if (authError || !data.user) {
+        console.error('Erro auth signInWithPassword:', authError);
+        const errMsg = authError?.message || '';
+        if (errMsg.toLowerCase().includes('network') || errMsg.toLowerCase().includes('fetch')) {
+          return { success: false, error: 'Falha de conexão com o servidor. Tente novamente.' };
+        }
         return { success: false, error: 'Nome de usuário ou senha incorretos.' };
       }
 
       // 3. Carregar dados do perfil e verificar se a conta está ativa
-      const { data: profile } = await supabase
+      const { data: profile, error: profileErr } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', data.user.id)
         .single();
+
+      if (profileErr) {
+        console.error('Erro ao verificar perfil:', profileErr);
+      }
 
       if (!profile || !profile.is_active) {
         await supabase.auth.signOut();
@@ -197,9 +223,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       await fetchUserData(data.user.id);
       return { success: true };
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Erro inesperado no login:', err);
-      return { success: false, error: 'Erro de conexão. Tente novamente em instantes.' };
+      const isFetchErr = err instanceof Error && err.message?.toLowerCase().includes('fetch');
+      return { 
+        success: false, 
+        error: isFetchErr 
+          ? 'Não foi possível conectar ao servidor. Verifique se o endereço do Supabase está correto.' 
+          : 'Erro ao processar login. Tente novamente.' 
+      };
     }
   };
 
@@ -233,4 +265,3 @@ export const useAuth = () => {
   }
   return context;
 };
-

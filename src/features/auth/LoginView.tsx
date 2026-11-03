@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Lock, User, AlertCircle, ArrowRight } from 'lucide-react';
+import { Lock, User, AlertCircle, ArrowRight, Eye, EyeOff } from 'lucide-react';
 
 export const LoginView: React.FC = () => {
   const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -13,7 +14,8 @@ export const LoginView: React.FC = () => {
     e.preventDefault();
     setError(null);
 
-    if (!username.trim()) {
+    const cleanUser = username.trim();
+    if (!cleanUser) {
       setError('Informe seu nome de usuário.');
       return;
     }
@@ -24,7 +26,7 @@ export const LoginView: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const result = await login(username, password);
+      const result = await login(cleanUser, password);
       if (!result.success) {
         setError(result.error || 'Falha ao autenticar.');
       }
@@ -103,14 +105,27 @@ export const LoginView: React.FC = () => {
                 </div>
                 <input
                   id="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="block w-full pl-10 pr-3.5 py-2.5 text-sm bg-gray-50/50 border border-gray-300 rounded-lg text-[#373535] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#DE3A39] focus:border-transparent transition-all"
+                  className="block w-full pl-10 pr-10 py-2.5 text-sm bg-gray-50/50 border border-gray-300 rounded-lg text-[#373535] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#DE3A39] focus:border-transparent transition-all"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer"
+                  tabIndex={-1}
+                  aria-label={showPassword ? 'Ocultar senha' : 'Exibir senha'}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
               </div>
             </div>
 
@@ -144,4 +159,3 @@ export const LoginView: React.FC = () => {
     </div>
   );
 };
-
