@@ -6,9 +6,11 @@ import { financialService } from '../../services/financialService';
 import { contentService } from '../../services/contentService';
 import { calendarService } from '../../services/calendarService';
 import { midiaService } from '../../services/midiaService';
+import { imobiliariaService } from '../../services/imobiliariaService';
 import { calculateDueDateAlert } from '../../types/conteudos';
 import { CalendarOverviewMetrics } from '../../types/calendario';
 import { MetaIntegrationConfig, MetaOverviewTotals } from '../../types/midia';
+import { CVCRMIntegrationConfig } from '../../types/imobiliarias';
 import {
   DollarSign,
   Kanban,
@@ -57,6 +59,13 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
     prevPeriodCpl: null,
   });
 
+  const [cvcrmConfig, setCvcrmConfig] = useState<CVCRMIntegrationConfig | null>(null);
+  const [imobiliariaTotals, setImobiliariaTotals] = useState({
+    leads: 0,
+    sales: 0,
+    conversionRate: 0,
+  });
+
   useEffect(() => {
     if (hasAccess('financeiro', 'consulta')) {
       financialService
@@ -93,6 +102,16 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
       midiaService.getCampaignInsights('este_mes', 'todos').then((res) => {
         const totals = midiaService.calculateTotals(res.data, res.prevData);
         setMetaTotals(totals);
+      });
+    }
+
+    if (hasAccess('imobiliarias', 'consulta')) {
+      imobiliariaService.getConfig().then(setCvcrmConfig);
+      imobiliariaService.getMonthlyMetrics().then((metrics) => {
+        const leads = metrics.reduce((sum, m) => sum + m.leads_received, 0);
+        const sales = metrics.reduce((sum, m) => sum + m.sales, 0);
+        const conversionRate = leads > 0 ? (sales / leads) * 100 : 0;
+        setImobiliariaTotals({ leads, sales, conversionRate });
       });
     }
   }, [hasAccess]);
@@ -336,15 +355,25 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
               <div className="space-y-2">
                 <div className="flex justify-between items-baseline">
                   <span className="text-xs text-gray-500">Integração CVCRM:</span>
-                  <span className="text-xs font-medium text-gray-400">Aguardando etapa</span>
+                  <span className={`text-xs font-bold ${
+                    cvcrmConfig?.status === 'conectado'
+                      ? 'text-emerald-600'
+                      : 'text-amber-600'
+                  }`}>
+                    {cvcrmConfig?.status === 'conectado' ? 'Conectado' : 'Aguardando Token'}
+                  </span>
                 </div>
                 <div className="flex justify-between items-baseline">
                   <span className="text-xs text-gray-500">Leads distribuídos:</span>
-                  <span className="text-xs font-medium text-gray-400">-</span>
+                  <span className="text-xs font-bold text-[#373535]">
+                    {imobiliariaTotals.leads > 0 ? `${imobiliariaTotals.leads} leads` : '0 leads'}
+                  </span>
                 </div>
                 <div className="flex justify-between items-baseline">
-                  <span className="text-xs text-gray-500">Conversão em vendas:</span>
-                  <span className="text-xs font-medium text-gray-400">-</span>
+                  <span className="text-xs text-gray-500">Vendas / Conversão:</span>
+                  <span className="text-xs font-bold text-emerald-600">
+                    {imobiliariaTotals.sales} ({imobiliariaTotals.conversionRate.toFixed(1)}%)
+                  </span>
                 </div>
               </div>
             </div>

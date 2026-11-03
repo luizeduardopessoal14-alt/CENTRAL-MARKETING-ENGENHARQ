@@ -9,6 +9,7 @@ import { FinanceiroView } from './features/financial/FinanceiroView';
 import { ConteudosView } from './features/conteudos/ConteudosView';
 import { CalendarioView } from './features/calendario/CalendarioView';
 import { MidiaView } from './features/midia/MidiaView';
+import { ImobiliariasView } from './features/imobiliarias/ImobiliariasView';
 import { ModulePlaceholder } from './features/placeholders/ModulePlaceholder';
 import { AppArea } from './types/auth';
 import { ShieldAlert } from 'lucide-react';
@@ -82,13 +83,7 @@ const MainLayout: React.FC = () => {
           ) : currentTab === 'midia' ? (
             <MidiaView />
           ) : currentTab === 'imobiliarias' ? (
-            <ModulePlaceholder
-              area="imobiliarias"
-              stepNumber={6}
-              title="Leads e Imobiliárias (CVCRM)"
-              description="Indicadores e gráficos de distribuição por imobiliária parceira, visitas e conversão em vendas via CVCRM."
-              onBack={() => setCurrentTab('visao_geral')}
-            />
+            <ImobiliariasView />
           ) : currentTab === 'relatorios' ? (
             <ModulePlaceholder
               area="relatorios"
