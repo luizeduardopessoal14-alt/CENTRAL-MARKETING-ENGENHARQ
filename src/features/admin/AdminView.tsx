@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
-import { UserProfile, UserPermission, AppArea, AccessLevel, AuditLogItem } from '../../types/auth';
+import { UserProfile, UserPermission, AppArea, AccessLevel } from '../../types/auth';
 import {
   UserPlus,
   KeyRound,
   UserCheck,
   UserX,
-  History,
   Shield,
   Search,
   CheckCircle2,
@@ -25,10 +24,8 @@ const areasList: { id: Exclude<AppArea, 'visao_geral'>; label: string }[] = [
 ];
 
 export const AdminView: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'usuarios' | 'auditoria'>('usuarios');
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [userPermissions, setUserPermissions] = useState<Record<string, Record<AppArea, AccessLevel>>>({});
-  const [auditLogs, setAuditLogs] = useState<AuditLogItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [feedbackMessage, setFeedbackMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -82,16 +79,6 @@ export const AdminView: React.FC = () => {
         });
       }
       setUserPermissions(permsMap);
-
-      // 3. Carregar logs de auditoria
-      const { data: logsData, error: logsError } = await supabase
-        .from('audit_logs')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      if (logsError) throw logsError;
-      setAuditLogs(logsData || []);
     } catch (err: unknown) {
       console.error('Erro ao carregar dados administrativos:', err);
       const message = err instanceof Error ? err.message : 'Falha ao buscar dados.';
@@ -275,45 +262,23 @@ export const AdminView: React.FC = () => {
         </div>
       )}
 
-      {/* Topo: Abas Internas e Ações */}
+      {/* Topo: Título da Seção e Ação */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-4">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setActiveTab('usuarios')}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-              activeTab === 'usuarios'
-                ? 'bg-[#373535] text-white shadow-xs'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
-          >
-            Contas e Permissões
-          </button>
-          <button
-            onClick={() => setActiveTab('auditoria')}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all ${
-              activeTab === 'auditoria'
-                ? 'bg-[#373535] text-white shadow-xs'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
-          >
-            <History className="w-4 h-4" />
-            <span>Histórico de Auditoria</span>
-          </button>
+        <div>
+          <h2 className="text-base font-bold text-[#373535]">Gerenciamento de Equipe e Permissões</h2>
+          <p className="text-xs text-gray-500">Defina o nível de acesso individual por aba para cada usuário do marketing.</p>
         </div>
 
-        {activeTab === 'usuarios' && (
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#DE3A39] hover:bg-[#C52B2A] text-white text-sm font-semibold rounded-lg shadow-sm transition-all"
-          >
-            <UserPlus className="w-4 h-4" />
-            <span>Cadastrar Usuário</span>
-          </button>
-        )}
+        <button
+          onClick={() => setIsCreateModalOpen(true)}
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#DE3A39] hover:bg-[#C52B2A] text-white text-sm font-semibold rounded-lg shadow-sm transition-all"
+        >
+          <UserPlus className="w-4 h-4" />
+          <span>Cadastrar Usuário</span>
+        </button>
       </div>
 
-      {activeTab === 'usuarios' && (
-        <div className="space-y-4">
+      <div className="space-y-4">
           {/* Barra de Busca e Filtro */}
           <div className="flex items-center justify-between gap-4">
             <div className="relative flex-1 max-w-sm">
@@ -466,51 +431,6 @@ export const AdminView: React.FC = () => {
             </div>
           </div>
         </div>
-      )}
-
-      {/* Aba de Auditoria */}
-      {activeTab === 'auditoria' && (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-xs overflow-hidden">
-          <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-            <h2 className="text-sm font-bold text-[#373535]">Histórico Oficial de Ações</h2>
-            <span className="text-xs text-gray-400">Registros atômicos e imutáveis</span>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50 text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200">
-                <tr>
-                  <th className="py-3 px-4">Data/Hora</th>
-                  <th className="py-3 px-4">Autor</th>
-                  <th className="py-3 px-4">Ação</th>
-                  <th className="py-3 px-4">Entidade</th>
-                  <th className="py-3 px-4">Detalhes</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {auditLogs.map((log) => (
-                  <tr key={log.id} className="hover:bg-gray-50/50">
-                    <td className="py-3 px-4 text-xs font-mono text-gray-500 whitespace-nowrap">
-                      {new Date(log.created_at).toLocaleString('pt-BR', {
-                        timeZone: 'America/Sao_Paulo',
-                      })}
-                    </td>
-                    <td className="py-3 px-4 font-semibold text-[#373535]">{log.user_name}</td>
-                    <td className="py-3 px-4">
-                      <span className="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 text-gray-700">
-                        {log.action}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-xs font-medium text-gray-600">{log.entity_type}</td>
-                    <td className="py-3 px-4 text-xs text-gray-500 font-mono">
-                      {JSON.stringify(log.details)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
 
       {/* Modal: Cadastrar Novo Usuário */}
       {isCreateModalOpen && (

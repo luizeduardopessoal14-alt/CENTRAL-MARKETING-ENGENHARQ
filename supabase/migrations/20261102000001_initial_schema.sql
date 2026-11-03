@@ -328,16 +328,6 @@ BEGIN
         ON CONFLICT (user_id, area) DO UPDATE SET access_level = EXCLUDED.access_level;
     END LOOP;
 
-    INSERT INTO public.audit_logs (user_id, user_name, action, entity_type, entity_id, details)
-    VALUES (
-        v_admin_id,
-        (SELECT full_name FROM public.profiles WHERE id = v_admin_id),
-        'criar',
-        'usuario',
-        v_new_user_id::text,
-        jsonb_build_object('username', v_clean_username, 'full_name', p_full_name, 'role', p_role)
-    );
-
     RETURN v_new_user_id;
 END;
 $$;
@@ -366,16 +356,6 @@ BEGIN
     SET encrypted_password = crypt(p_new_password, gen_salt('bf', 10)),
         updated_at = now()
     WHERE id = p_target_user_id;
-
-    INSERT INTO public.audit_logs (user_id, user_name, action, entity_type, entity_id, details)
-    VALUES (
-        v_admin_id,
-        (SELECT full_name FROM public.profiles WHERE id = v_admin_id),
-        'redefinir_senha',
-        'usuario',
-        p_target_user_id::text,
-        '{}'::jsonb
-    );
 
     RETURN TRUE;
 END;
@@ -413,16 +393,6 @@ BEGIN
         updated_at = now()
     WHERE id = p_target_user_id;
 
-    INSERT INTO public.audit_logs (user_id, user_name, action, entity_type, entity_id, details)
-    VALUES (
-        v_admin_id,
-        (SELECT full_name FROM public.profiles WHERE id = v_admin_id),
-        CASE WHEN p_is_active THEN 'ativar' ELSE 'desativar' END,
-        'usuario',
-        p_target_user_id::text,
-        jsonb_build_object('novo_status', p_is_active)
-    );
-
     RETURN TRUE;
 END;
 $$;
@@ -453,16 +423,6 @@ BEGIN
     ON CONFLICT (user_id, area) DO UPDATE 
     SET access_level = EXCLUDED.access_level,
         updated_at = now();
-
-    INSERT INTO public.audit_logs (user_id, user_name, action, entity_type, entity_id, details)
-    VALUES (
-        v_admin_id,
-        (SELECT full_name FROM public.profiles WHERE id = v_admin_id),
-        'editar_permissao',
-        'permissao',
-        p_target_user_id::text,
-        jsonb_build_object('area', p_area, 'nivel', p_access_level)
-    );
 
     RETURN TRUE;
 END;
