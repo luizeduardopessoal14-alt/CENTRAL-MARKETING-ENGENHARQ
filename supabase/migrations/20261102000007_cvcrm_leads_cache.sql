@@ -43,3 +43,4 @@ USING (
         public.has_area_permission(auth.uid(), 'imobiliarias', 'edicao')
     )
 );
+

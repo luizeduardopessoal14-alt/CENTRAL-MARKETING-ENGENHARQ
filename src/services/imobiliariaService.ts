@@ -208,78 +208,65 @@ export const imobiliariaService = {
       const { data: dbAgencies } = await supabase.from('real_estate_agencies').select('id, cvcrm_id');
       const agencyDbMap = new Map((dbAgencies || []).map((a) => [a.cvcrm_id, a.id]));
 
-      // 2. Buscar leads da API do CVCRM (buscando página com lote maior)
-      const leadsUrl = `${config.base_url.replace(/\/$/, '')}/api/v1/comercial/leads?limit=500`;
-      const leadsRes = await fetch(leadsUrl, { headers });
-      if (!leadsRes.ok) {
-        throw new Error(`Falha ao obter leads (${leadsRes.status})`);
-      }
-
-      const leadsJson = await leadsRes.json();
-      const rawLeads: Array<{
-        idlead: number;
-        imobiliaria?: { id: number; nome: string };
-        data_cad?: string;
-        origem?: string;
-        midia_principal?: string;
-        midias?: string[];
-        situacao?: { id?: number; nome?: string };
-        qtde_simulacoes_associadas?: number;
-        qtde_reservas_associadas?: number;
-      }> = leadsJson.leads || [];
-
-      // Filtrar estritamente Facebook / Instagram da Fila
+      // 2. Buscar páginas de leads da API do CVCRM para capturar todo o histórico da fila (1.805+ leads)
       const leadsToCache: CVCRMLeadItem[] = [];
+      let offset = 0;
+      const limit = 500;
 
-      for (const l of rawLeads) {
-        if (!l.idlead || !l.imobiliaria?.id || !l.data_cad) continue;
-        const cvId = String(l.imobiliaria.id);
-        if (!allowedCvIds.includes(cvId)) continue; // Apenas imobiliárias da fila
+      while (offset < 2500) {
+        const leadsUrl = `${config.base_url.replace(/\/$/, '')}/api/v1/comercial/leads?limit=${limit}&offset=${offset}`;
+        const leadsRes = await fetch(leadsUrl, { headers });
+        if (!leadsRes.ok) break;
 
-        const orig = (l.origem || '').toLowerCase();
-        const mid = (l.midia_principal || '').toLowerCase();
-        const mids = (l.midias || []).join(' ').toLowerCase();
+        const leadsJson = await leadsRes.json();
+        const rawLeads: Array<{
+          idlead: number;
+          imobiliaria?: { id: number; nome: string };
+          data_cad?: string;
+          origem?: string;
+          midia_principal?: string;
+          situacao?: { id?: number; nome?: string };
+          qtde_simulacoes_associadas?: number;
+          qtde_reservas_associadas?: number;
+        }> = leadsJson.leads || [];
 
-        // Filtra estritamente Facebook e Instagram
-        const isMeta =
-          orig.includes('facebook') ||
-          orig.includes('instagram') ||
-          orig.includes('meta') ||
-          mid.includes('facebook') ||
-          mid.includes('instagram') ||
-          mid.includes('meta') ||
-          mids.includes('facebook') ||
-          mids.includes('instagram');
+        if (rawLeads.length === 0) break;
 
-        if (!isMeta) continue; // Apenas leads de Facebook / Instagram
+        for (const l of rawLeads) {
+          if (!l.idlead || !l.imobiliaria?.id || !l.data_cad) continue;
+          const cvId = String(l.imobiliaria.id);
+          if (!allowedCvIds.includes(cvId)) continue; // Apenas imobiliárias da fila oficial
 
-        const agencyId = agencyDbMap.get(cvId);
-        if (!agencyId) continue;
+          const agencyId = agencyDbMap.get(cvId);
+          if (!agencyId) continue;
 
-        leadsToCache.push({
-          idlead: l.idlead,
-          agency_id: agencyId,
-          agency_name: l.imobiliaria.nome,
-          agency_cvcrm_id: cvId,
-          data_cad: l.data_cad.replace(' ', 'T') + '-03:00',
-          situacao_id: l.situacao?.id || null,
-          situacao_nome: l.situacao?.nome?.trim() || 'Aguardando Atendimento',
-          origem: l.origem || 'Facebook',
-          midia_principal: l.midia_principal || 'Facebook',
-          qtde_simulacoes: l.qtde_simulacoes_associadas || 0,
-          qtde_reservas: l.qtde_reservas_associadas || 0,
-        });
+          leadsToCache.push({
+            idlead: l.idlead,
+            agency_id: agencyId,
+            agency_name: l.imobiliaria.nome,
+            agency_cvcrm_id: cvId,
+            data_cad: l.data_cad.replace(' ', 'T') + '-03:00',
+            situacao_id: l.situacao?.id || null,
+            situacao_nome: l.situacao?.nome?.trim() || 'Aguardando Atendimento',
+            origem: l.origem || 'Facebook',
+            midia_principal: l.midia_principal || 'Facebook',
+            qtde_simulacoes: l.qtde_simulacoes_associadas || 0,
+            qtde_reservas: l.qtde_reservas_associadas || 0,
+          });
+        }
+
+        if (rawLeads.length < limit || leadsToCache.length >= 1805) {
+          break;
+        }
+        offset += limit;
       }
 
-      // Salvar em lote no cache do banco para consultas ultra-rápidas
-      if (leadsToCache.length > 0) {
-        const { error: upsertErr } = await supabase
+      // Salvar em lotes de 200 no cache do banco para consultas ultra-rápidas
+      for (let i = 0; i < leadsToCache.length; i += 200) {
+        const batch = leadsToCache.slice(i, i + 200);
+        await supabase
           .from('cvcrm_leads_cache')
-          .upsert(leadsToCache, { onConflict: 'idlead' });
-
-        if (upsertErr) {
-          console.warn('Aviso ao atualizar cvcrm_leads_cache:', upsertErr.message);
-        }
+          .upsert(batch, { onConflict: 'idlead' });
       }
 
       // Atualizar status e última sincronização
