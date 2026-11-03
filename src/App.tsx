@@ -8,6 +8,7 @@ import { AdminView } from './features/admin/AdminView';
 import { FinanceiroView } from './features/financial/FinanceiroView';
 import { ConteudosView } from './features/conteudos/ConteudosView';
 import { CalendarioView } from './features/calendario/CalendarioView';
+import { MidiaView } from './features/midia/MidiaView';
 import { ModulePlaceholder } from './features/placeholders/ModulePlaceholder';
 import { AppArea } from './types/auth';
 import { ShieldAlert } from 'lucide-react';
@@ -79,13 +80,7 @@ const MainLayout: React.FC = () => {
           ) : currentTab === 'calendario' ? (
             <CalendarioView />
           ) : currentTab === 'midia' ? (
-            <ModulePlaceholder
-              area="midia"
-              stepNumber={5}
-              title="Mídia e Campanhas (Meta Ads & Instagram)"
-              description="Integração e acompanhamento de investimento, cadastros e custo por lead de anúncios, sem conexão externa simulada."
-              onBack={() => setCurrentTab('visao_geral')}
-            />
+            <MidiaView />
           ) : currentTab === 'imobiliarias' ? (
             <ModulePlaceholder
               area="imobiliarias"

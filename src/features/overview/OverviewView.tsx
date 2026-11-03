@@ -5,8 +5,10 @@ import { FinancialTotals } from '../../types/financeiro';
 import { financialService } from '../../services/financialService';
 import { contentService } from '../../services/contentService';
 import { calendarService } from '../../services/calendarService';
+import { midiaService } from '../../services/midiaService';
 import { calculateDueDateAlert } from '../../types/conteudos';
 import { CalendarOverviewMetrics } from '../../types/calendario';
+import { MetaIntegrationConfig, MetaOverviewTotals } from '../../types/midia';
 import {
   DollarSign,
   Kanban,
@@ -42,6 +44,19 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
     eventsThisMonthCount: 0,
   });
 
+  const [metaConfig, setMetaConfig] = useState<MetaIntegrationConfig | null>(null);
+  const [metaTotals, setMetaTotals] = useState<MetaOverviewTotals>({
+    totalSpend: 0,
+    totalLeads: 0,
+    avgCostPerLead: null,
+    totalReach: 0,
+    totalImpressions: 0,
+    avgCpm: null,
+    prevPeriodSpend: 0,
+    prevPeriodLeads: 0,
+    prevPeriodCpl: null,
+  });
+
   useEffect(() => {
     if (hasAccess('financeiro', 'consulta')) {
       financialService
@@ -71,6 +86,14 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
 
     if (hasAccess('calendario', 'consulta')) {
       calendarService.getOverviewMetrics().then(setCalendarMetrics);
+    }
+
+    if (hasAccess('midia', 'consulta')) {
+      midiaService.getConfig().then((res) => setMetaConfig(res.data));
+      midiaService.getCampaignInsights('este_mes', 'todos').then((res) => {
+        const totals = midiaService.calculateTotals(res.data, res.prevData);
+        setMetaTotals(totals);
+      });
     }
   }, [hasAccess]);
 
@@ -258,15 +281,33 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
               <div className="space-y-2">
                 <div className="flex justify-between items-baseline">
                   <span className="text-xs text-gray-500">Investimento (Meta):</span>
-                  <span className="text-xs font-medium text-gray-400">Sem conexão</span>
+                  <span className="text-xs font-bold text-[#373535]">
+                    {metaTotals.totalSpend > 0
+                      ? formatCurrency(metaTotals.totalSpend)
+                      : metaConfig?.status === 'conectado'
+                      ? 'R$ 0,00'
+                      : metaConfig?.ad_account_id
+                      ? 'IDs salvos (Token pendente)'
+                      : 'Sem conexão'}
+                  </span>
                 </div>
                 <div className="flex justify-between items-baseline">
                   <span className="text-xs text-gray-500">Cadastros gerados:</span>
-                  <span className="text-xs font-medium text-gray-400">Dados indisponíveis</span>
+                  <span className="text-xs font-semibold text-red-600">
+                    {metaTotals.totalLeads > 0
+                      ? `${metaTotals.totalLeads} leads`
+                      : metaConfig?.status === 'conectado'
+                      ? '0 leads'
+                      : 'Aguardando dados'}
+                  </span>
                 </div>
                 <div className="flex justify-between items-baseline">
                   <span className="text-xs text-gray-500">Custo por lead (CPL):</span>
-                  <span className="text-xs font-medium text-gray-400">-</span>
+                  <span className="text-xs font-semibold text-gray-700">
+                    {metaTotals.avgCostPerLead !== null
+                      ? formatCurrency(metaTotals.avgCostPerLead)
+                      : '-'}
+                  </span>
                 </div>
               </div>
             </div>
