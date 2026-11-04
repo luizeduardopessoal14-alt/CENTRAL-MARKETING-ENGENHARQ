@@ -1,3 +1,5 @@
+import { AppArea } from './auth';
+
 export type DashboardPeriodMode =
   | 'este_mes'
   | 'mes_passado'
@@ -14,6 +16,72 @@ export interface DashboardDateRange {
   prevEndDate: string;
 }
 
+export interface SparklinePoint {
+  date: string;
+  value: number;
+}
+
+export interface KpiCardDetail {
+  id: string;
+  title: string;
+  value: number;
+  formattedValue: string;
+  unit?: string;
+  subtitle: string;
+  deltaPercent: number | null;
+  deltaType: 'positive' | 'negative' | 'neutral';
+  sparkline: SparklinePoint[];
+  targetValue?: number;
+  targetDescription?: string;
+  tooltip: string;
+  accentColor: string;
+}
+
+export interface HeroPerformanceDataPoint {
+  date: string;
+  dateLabel: string;
+  leads: number;
+  qualificados: number;
+  reservas: number;
+  vendas: number;
+}
+
+export interface FunnelStageItem {
+  stageKey: string;
+  stageName: string;
+  count: number;
+  percentageFromTop: number;
+  dropOffCount: number;
+  dropOffPercent: number;
+  isBottleneck: boolean;
+  color: string;
+}
+
+export interface ChannelPerformanceItem {
+  channel: string;
+  label: string;
+  count: number;
+  sharePercent: number;
+  qualifiedCount: number;
+  qualificationRate: number;
+  salesCount: number;
+  conversionRate: number;
+  color: string;
+}
+
+export interface AgencyPerformanceRow {
+  agencyId: string;
+  agencyName: string;
+  leadsCount: number;
+  inServiceCount: number;
+  qualifiedCount: number;
+  reservasCount: number;
+  vendasCount: number;
+  conversionRate: number; // %
+  shareOfLeads: number; // %
+  statusBadge: 'top' | 'regular' | 'atencao';
+}
+
 export interface FinancialAnalyticsData {
   totalPaid: number;
   totalCommitted: number;
@@ -24,8 +92,8 @@ export interface FinancialAnalyticsData {
   paidDiffPercent: number | null;
   
   monthlyTrend: Array<{
-    monthKey: string; // '2026-04'
-    monthLabel: string; // 'Abr/26'
+    monthKey: string;
+    monthLabel: string;
     pago: number;
     previsto: number;
     total: number;
@@ -55,48 +123,15 @@ export interface FinancialAnalyticsData {
   }>;
 }
 
-export interface FunnelStageItem {
-  stageKey: string;
-  stageName: string;
-  count: number;
-  percentageFromTop: number;
-  color: string;
-}
-
-export interface AgencyPerformanceRow {
-  agencyId: string;
-  agencyName: string;
-  leadsCount: number;
-  reservasCount: number;
-  vendasCount: number;
-  conversionRate: number; // %
-  shareOfLeads: number; // %
-}
-
-export interface LeadsAnalyticsData {
-  totalLeads: number;
-  prevTotalLeads: number;
-  leadsDiffPercent: number | null;
-  totalSimulacoes: number;
-  totalReservas: number;
-  totalVendas: number;
-  conversionRate: number;
-  prevConversionRate: number | null;
-  qualificationRate: number; // leads que avançaram além do contato inicial
-
-  funnelStages: FunnelStageItem[];
-  agencyRankings: AgencyPerformanceRow[];
-}
-
-export interface MediaCrossAnalyticsData {
-  totalSpend: number;
-  totalLeads: number;
-  cplReal: number | null;
-  costPerReservation: number | null;
-  costPerSale: number | null;
-  prevSpend: number;
-  prevCplReal: number | null;
-  spendDiffPercent: number | null;
+export interface ManagerialAlertItem {
+  id: string;
+  severity: 'critico' | 'atencao' | 'oportunidade' | 'info';
+  category: 'financeiro' | 'crm' | 'imobiliaria' | 'meta' | 'conteudo';
+  title: string;
+  description: string;
+  metricBadge?: string;
+  targetTab?: AppArea;
+  actionText?: string;
 }
 
 export interface OperationalQuickData {
@@ -112,10 +147,22 @@ export interface OperationalQuickData {
 export interface DashboardFullData {
   periodMode: DashboardPeriodMode;
   dateRange: DashboardDateRange;
+  kpis: {
+    investedTotal: KpiCardDetail;
+    leadsReceived: KpiCardDetail;
+    cplReal: KpiCardDetail;
+    leadsQualified: KpiCardDetail;
+    reservas: KpiCardDetail;
+    vendas: KpiCardDetail;
+    conversionRate: KpiCardDetail;
+    cacReal: KpiCardDetail;
+  };
+  heroPerformance: HeroPerformanceDataPoint[];
+  funnelStages: FunnelStageItem[];
+  channels: ChannelPerformanceItem[];
+  agencies: AgencyPerformanceRow[];
   financial: FinancialAnalyticsData;
-  leads: LeadsAnalyticsData;
-  media: MediaCrossAnalyticsData;
+  alerts: ManagerialAlertItem[];
   operational: OperationalQuickData;
   updatedAt: string;
 }
-
