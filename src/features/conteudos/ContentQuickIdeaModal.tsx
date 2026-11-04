@@ -87,7 +87,7 @@ export const ContentQuickIdeaModal: React.FC<ContentQuickIdeaModalProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Ex: Vídeo mostrando os bastidores da concretagem da laje do Residencial Horizonte com depoimento do engenheiro..."
-              className="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#DE3A39] focus:border-transparent transition-all resize-none"
+              className="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#B21010] focus:border-transparent transition-all resize-none"
               autoFocus
             />
             <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
@@ -108,7 +108,7 @@ export const ContentQuickIdeaModal: React.FC<ContentQuickIdeaModalProps> = ({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#DE3A39] hover:bg-[#C52B2A] transition-all shadow-xs disabled:opacity-60 cursor-pointer flex items-center gap-1.5"
+              className="px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#B21010] hover:bg-[#8F0D0D] transition-all shadow-xs disabled:opacity-60 cursor-pointer flex items-center gap-1.5"
             >
               {isSubmitting ? 'Salvando...' : 'Salvar Ideia'}
             </button>

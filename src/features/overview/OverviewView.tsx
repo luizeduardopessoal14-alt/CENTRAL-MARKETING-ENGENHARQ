@@ -71,24 +71,24 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto space-y-6">
       {/* Banner de Cabeçalho Executivo */}
-      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-gray-200/90 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#DE3A39] animate-pulse" />
-            <span className="text-xs font-bold uppercase tracking-wider text-[#DE3A39]">
+            <span className="w-2 h-2 rounded-full bg-[#B21010] animate-pulse" />
+            <span className="text-xs font-bold uppercase tracking-wider text-[#B21010]">
               Painel Analítico Executivo
             </span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-black text-[#373535] mt-1 tracking-tight">
-            Central de Marketing EngenhArq
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-1 tracking-tight">
+            Central de Marketing <span className="text-[#B21010]">in Control</span>
           </h2>
-          <p className="text-xs sm:text-sm text-gray-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Indicadores de performance financeira, esteiras de leads do CVCRM e eficiência de campanhas em tempo real.
           </p>
         </div>
 
         <div className="flex items-center gap-2 self-start md:self-auto">
-          <div className="px-3 py-1.5 bg-gray-50 border border-gray-200/80 rounded-xl text-xs font-medium text-gray-600">
+          <div className="px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-600">
             Fuso: <strong>São Paulo (BRT)</strong>
           </div>
         </div>
@@ -110,7 +110,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
       {/* Tratamento de Erro */}
       {error && (
         <div className="p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-3 text-xs text-red-700">
-          <AlertCircle className="w-4 h-4 text-[#DE3A39] flex-shrink-0" />
+          <AlertCircle className="w-4 h-4 text-[#B21010] flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
@@ -120,12 +120,12 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
         <div className="space-y-6 animate-pulse">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-28 bg-gray-100 rounded-2xl" />
+              <div key={i} className="h-28 bg-slate-100 rounded-2xl" />
             ))}
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 h-72 bg-gray-100 rounded-2xl" />
-            <div className="h-72 bg-gray-100 rounded-2xl" />
+            <div className="lg:col-span-2 h-72 bg-slate-100 rounded-2xl" />
+            <div className="h-72 bg-slate-100 rounded-2xl" />
           </div>
         </div>
       ) : dashboardData ? (
@@ -144,7 +144,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
               onNavigateToFinancial={() => onNavigate('financeiro')}
             />
           ) : (
-            <div className="p-5 bg-white rounded-2xl border border-gray-200 text-center text-xs text-gray-400">
+            <div className="p-5 bg-white rounded-2xl border border-slate-200 text-center text-xs text-slate-400">
               Módulo Financeiro restrito às suas permissões de acesso.
             </div>
           )}
@@ -156,7 +156,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
               onNavigateToLeads={() => onNavigate('imobiliarias')}
             />
           ) : (
-            <div className="p-5 bg-white rounded-2xl border border-gray-200 text-center text-xs text-gray-400">
+            <div className="p-5 bg-white rounded-2xl border border-slate-200 text-center text-xs text-slate-400">
               Módulo de Leads e Imobiliárias restrito às suas permissões de acesso.
             </div>
           )}

@@ -138,7 +138,7 @@ export const CalendarEventModal: React.FC<CalendarEventModalProps> = ({
           <div className="flex items-center gap-2.5">
             <div
               className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                type === 'evento' ? 'bg-red-50 text-[#DE3A39]' : 'bg-blue-50 text-blue-600'
+                type === 'evento' ? 'bg-red-50 text-[#B21010]' : 'bg-blue-50 text-blue-600'
               }`}
             >
               <Calendar className="w-4 h-4" />
@@ -188,7 +188,7 @@ export const CalendarEventModal: React.FC<CalendarEventModalProps> = ({
                       className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
                         isSelected
                           ? t.id === 'evento'
-                            ? 'bg-red-50/80 border-[#DE3A39] text-[#DE3A39] ring-2 ring-[#DE3A39]/20'
+                            ? 'bg-red-50/80 border-[#B21010] text-[#B21010] ring-2 ring-[#B21010]/20'
                             : 'bg-blue-50/80 border-blue-500 text-blue-700 ring-2 ring-blue-500/20'
                           : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100/70'
                       }`}
@@ -220,7 +220,7 @@ export const CalendarEventModal: React.FC<CalendarEventModalProps> = ({
                     ? 'Ex: Alinhamento de Campanha com a Diretoria'
                     : 'Ex: Lançamento do Residencial Horizonte no Stand'
                 }
-                className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#DE3A39] transition-all disabled:opacity-70"
+                className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#B21010] transition-all disabled:opacity-70"
               />
             </div>
 
@@ -236,7 +236,7 @@ export const CalendarEventModal: React.FC<CalendarEventModalProps> = ({
                   disabled={!canEdit}
                   value={eventDate}
                   onChange={(e) => setEventDate(e.target.value)}
-                  className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#DE3A39] transition-all disabled:opacity-70"
+                  className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#B21010] transition-all disabled:opacity-70"
                 />
               </div>
 
@@ -250,7 +250,7 @@ export const CalendarEventModal: React.FC<CalendarEventModalProps> = ({
                   disabled={!canEdit}
                   value={startTime}
                   onChange={(e) => setStartTime(e.target.value)}
-                  className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#DE3A39] transition-all disabled:opacity-70"
+                  className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#B21010] transition-all disabled:opacity-70"
                 />
               </div>
 
@@ -264,7 +264,7 @@ export const CalendarEventModal: React.FC<CalendarEventModalProps> = ({
                   disabled={!canEdit}
                   value={endTime}
                   onChange={(e) => setEndTime(e.target.value)}
-                  className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#DE3A39] transition-all disabled:opacity-70"
+                  className="w-full px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#B21010] transition-all disabled:opacity-70"
                 />
               </div>
             </div>
@@ -294,7 +294,7 @@ export const CalendarEventModal: React.FC<CalendarEventModalProps> = ({
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="Ex: Sala de Reuniões 02 ou https://meet.google.com/xyz"
-                className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#DE3A39] transition-all disabled:opacity-70"
+                className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#B21010] transition-all disabled:opacity-70"
               />
             </div>
 
@@ -310,7 +310,7 @@ export const CalendarEventModal: React.FC<CalendarEventModalProps> = ({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Descreva os tópicos a serem alinhados, participantes ou detalhes do evento..."
-                className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#DE3A39] transition-all resize-none disabled:opacity-70"
+                className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#B21010] transition-all resize-none disabled:opacity-70"
               />
             </div>
           </form>
@@ -346,7 +346,7 @@ export const CalendarEventModal: React.FC<CalendarEventModalProps> = ({
                 type="submit"
                 form="eventForm"
                 disabled={isSubmitting}
-                className="px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#DE3A39] hover:bg-[#C52B2A] transition-all shadow-xs disabled:opacity-60 cursor-pointer flex items-center gap-1.5"
+                className="px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#B21010] hover:bg-[#8F0D0D] transition-all shadow-xs disabled:opacity-60 cursor-pointer flex items-center gap-1.5"
               >
                 {isSubmitting ? 'Salvando...' : event ? 'Salvar Alterações' : 'Criar Compromisso'}
               </button>

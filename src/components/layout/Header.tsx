@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { AppArea } from '../../types/auth';
+import { ChevronRight, Clock, ShieldCheck } from 'lucide-react';
 
 interface HeaderProps {
   currentTab: AppArea | 'admin';
@@ -9,19 +10,19 @@ interface HeaderProps {
 const titles: Record<AppArea | 'admin', { title: string; subtitle: string }> = {
   visao_geral: {
     title: 'Visão Geral',
-    subtitle: 'Painel central de indicadores de marketing da EngenhArq',
+    subtitle: 'Painel analítico executivo e inteligência de marketing',
   },
   financeiro: {
     title: 'Financeiro',
-    subtitle: 'Acompanhamento de pagamentos, cobranças e previsão com Sienge',
+    subtitle: 'Gestão de despesas, fluxo de caixa e integração com Sienge',
   },
   midia: {
     title: 'Mídia e Campanhas',
-    subtitle: 'Indicadores do Instagram e contas de anúncios Meta',
+    subtitle: 'Métricas de tráfego pago, Meta Ads e Instagram Insights',
   },
   conteudos: {
     title: 'Conteúdos',
-    subtitle: 'Quadro Kanban de produção e aprovação de redes sociais',
+    subtitle: 'Quadro Kanban de produção e aprovação para redes sociais',
   },
   calendario: {
     title: 'Calendário',
@@ -29,53 +30,72 @@ const titles: Record<AppArea | 'admin', { title: string; subtitle: string }> = {
   },
   imobiliarias: {
     title: 'Leads e Imobiliárias',
-    subtitle: 'Distribuição de leads e conversões integradas com CVCRM',
+    subtitle: 'Distribuição da fila TOP 5 e esteiras comerciais integradas ao CVCRM',
   },
   relatorios: {
     title: 'Relatórios Executivos',
-    subtitle: 'Exportação padronizada em PDF com gráficos incorporados',
+    subtitle: 'Exportação executiva em PDF com identidade corporativa',
   },
   admin: {
-    title: 'Administração de Usuários e Permissões',
-    subtitle: 'Gerenciamento de contas, acessos por aba e auditoria do sistema',
+    title: 'Administração do Sistema',
+    subtitle: 'Gestão de contas, permissões por aba e controle de acessos',
   },
 };
 
 export const Header: React.FC<HeaderProps> = ({ currentTab }) => {
   const { user } = useAuth();
-  const current = titles[currentTab] || { title: 'Central de Marketing', subtitle: '' };
+  const current = titles[currentTab] || { title: 'Marketing Control', subtitle: '' };
 
   // Data atual no formato brasileiro (São Paulo)
   const todayFormatted = new Intl.DateTimeFormat('pt-BR', {
     timeZone: 'America/Sao_Paulo',
-    weekday: 'long',
+    weekday: 'short',
     day: '2-digit',
-    month: 'long',
-    year: 'numeric',
+    month: 'short',
   }).format(new Date());
 
-  // Primeira letra maiúscula no dia da semana
-  const capitalizedDate =
-    todayFormatted.charAt(0).toUpperCase() + todayFormatted.slice(1);
-
   return (
-    <header className="h-16 bg-white border-b border-gray-200 px-8 flex items-center justify-between flex-shrink-0">
-      <div>
-        <h1 className="text-lg font-bold text-[#373535] leading-tight">
-          {current.title}
-        </h1>
-        <p className="text-xs text-gray-500">{current.subtitle}</p>
+    <header className="h-[60px] bg-white border-b border-slate-200/80 px-6 sm:px-8 flex items-center justify-between flex-shrink-0 z-10">
+      {/* Lado Esquerdo: Breadcrumb & Título */}
+      <div className="flex items-center gap-3 min-w-0">
+        <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+          <span className="hidden sm:inline">Marketing Control</span>
+          <ChevronRight className="w-3.5 h-3.5 text-slate-300 hidden sm:inline" />
+          <span className="font-bold text-slate-900 text-sm truncate">
+            {current.title}
+          </span>
+        </div>
       </div>
 
-      <div className="flex items-center gap-4">
-        <div className="text-right hidden sm:block">
-          <p className="text-xs font-medium text-gray-700">{capitalizedDate}</p>
-          <p className="text-[11px] text-gray-400">
-            Conectado como <strong className="text-[#373535]">{user?.username}</strong>
-          </p>
+      {/* Lado Direito: Horário, Fuso e Perfil */}
+      <div className="flex items-center gap-3 sm:gap-4">
+        {/* Data & Fuso */}
+        <div className="hidden md:flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200/70 rounded-lg text-[11px] font-medium text-slate-600">
+          <Clock className="w-3 h-3 text-slate-400" />
+          <span className="capitalize">{todayFormatted}</span>
+          <span className="text-slate-300">•</span>
+          <span>BRT</span>
+        </div>
+
+        {/* Badge do Usuário */}
+        <div className="flex items-center gap-2 pl-2 border-l border-slate-100">
+          <div className="text-right">
+            <p className="text-xs font-bold text-slate-800 leading-tight">
+              {user?.username}
+            </p>
+            <p className="text-[10px] text-slate-400 flex items-center justify-end gap-1 font-medium">
+              {user?.role === 'superadmin' ? (
+                <>
+                  <ShieldCheck className="w-3 h-3 text-[#B21010]" />
+                  <span>Superadmin</span>
+                </>
+              ) : (
+                'Membro'
+              )}
+            </p>
+          </div>
         </div>
       </div>
     </header>
   );
 };
-

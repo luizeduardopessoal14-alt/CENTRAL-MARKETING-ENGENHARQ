@@ -27,17 +27,17 @@ export const FinancialFilters: React.FC<FinancialFiltersProps> = ({
   isLoading,
 }) => {
   return (
-    <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-xs space-y-3">
+    <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs space-y-3.5">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
         {/* Barra de Busca */}
         <div className="relative flex-1 min-w-[240px]">
-          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Buscar por fornecedor, descrição, nota ou autorizador..."
+            placeholder="Buscar por fornecedor, descrição, nota fiscal..."
             value={filters.search || ''}
             onChange={(e) => onFilterChange({ search: e.target.value })}
-            className="w-full pl-9 pr-3.5 py-2 text-xs bg-gray-50/50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE3A39] focus:bg-white transition-all text-[#373535]"
+            className="w-full pl-10 pr-3.5 py-2 text-xs bg-slate-50/70 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#B21010] focus:bg-white transition-all text-slate-800 placeholder-slate-400"
           />
         </div>
 
@@ -47,7 +47,7 @@ export const FinancialFilters: React.FC<FinancialFiltersProps> = ({
           <select
             value={filters.category || 'all'}
             onChange={(e) => onFilterChange({ category: e.target.value })}
-            className="text-xs bg-gray-50/50 border border-gray-200 rounded-lg px-2.5 py-2 text-[#373535] focus:outline-none focus:ring-2 focus:ring-[#DE3A39] focus:bg-white"
+            className="text-xs bg-slate-50/70 border border-slate-200 rounded-xl px-3 py-2 text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-[#B21010] focus:bg-white"
           >
             <option value="all">Todas as Categorias</option>
             {FINANCIAL_CATEGORIES.map((cat) => (
@@ -62,7 +62,7 @@ export const FinancialFilters: React.FC<FinancialFiltersProps> = ({
             disabled={filters.consultFinanceOnly}
             value={filters.statusFilter || 'all'}
             onChange={(e) => onFilterChange({ statusFilter: e.target.value })}
-            className="text-xs bg-gray-50/50 border border-gray-200 rounded-lg px-2.5 py-2 text-[#373535] focus:outline-none focus:ring-2 focus:ring-[#DE3A39] focus:bg-white disabled:opacity-50"
+            className="text-xs bg-slate-50/70 border border-slate-200 rounded-xl px-3 py-2 text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-[#B21010] focus:bg-white disabled:opacity-50"
           >
             <option value="all">Todas as Situações</option>
             <option value="a_encaminhar">A encaminhar</option>
@@ -76,21 +76,21 @@ export const FinancialFilters: React.FC<FinancialFiltersProps> = ({
           <button
             onClick={onRefresh}
             title="Atualizar dados"
-            className="p-2 text-gray-500 hover:text-[#373535] border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            className="p-2 text-slate-500 hover:text-slate-900 border border-slate-200 rounded-xl hover:bg-slate-50 transition-all active:scale-[0.98] cursor-pointer"
           >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-[#B21010]' : ''}`} />
           </button>
         </div>
 
         {/* Botões de Ação */}
-        <div className="flex items-center gap-2 pt-2 lg:pt-0 border-t lg:border-t-0 border-gray-100">
+        <div className="flex items-center gap-2 pt-2 lg:pt-0 border-t lg:border-t-0 border-slate-100">
           {isSuperadmin && (
             <button
               onClick={onOpenTrashModal}
               title="Abrir Lixeira (Cobranças excluídas)"
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all active:scale-[0.98] cursor-pointer"
             >
-              <Trash2 className="w-3.5 h-3.5 text-gray-500" />
+              <Trash2 className="w-3.5 h-3.5 text-slate-500" />
               <span>Lixeira</span>
             </button>
           )}
@@ -98,23 +98,23 @@ export const FinancialFilters: React.FC<FinancialFiltersProps> = ({
           {canEdit && (
             <button
               onClick={onOpenCreateModal}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#DE3A39] hover:bg-[#C52B2A] text-white text-xs font-semibold rounded-lg shadow-sm transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#B21010] hover:bg-[#8F0D0D] text-white text-xs font-bold rounded-xl shadow-xs transition-all active:scale-[0.98] cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              <span>Nova Cobrança</span>
+              <span>Nova Despesa</span>
             </button>
           )}
         </div>
       </div>
 
       {/* Barra de Filtro Especial: Consultar com o financeiro */}
-      <div className="flex items-center justify-between pt-2 border-t border-gray-100 text-xs">
+      <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 text-xs">
         <div className="flex items-center gap-2">
           <button
             onClick={() =>
               onFilterChange({ consultFinanceOnly: !filters.consultFinanceOnly })
             }
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
               filters.consultFinanceOnly
                 ? 'bg-amber-500 text-white shadow-xs font-semibold'
                 : 'bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100'
@@ -134,7 +134,7 @@ export const FinancialFilters: React.FC<FinancialFiltersProps> = ({
               </span>
             )}
           </button>
-          <span className="text-[11px] text-gray-400 hidden sm:inline">
+          <span className="text-[11px] text-slate-400 hidden sm:inline font-medium">
             Filtra cobranças sem previsão ou com previsão ultrapassada no Sienge.
           </span>
         </div>
@@ -142,7 +142,7 @@ export const FinancialFilters: React.FC<FinancialFiltersProps> = ({
         {filters.consultFinanceOnly && (
           <button
             onClick={() => onFilterChange({ consultFinanceOnly: false })}
-            className="text-xs text-gray-500 hover:text-gray-800 underline cursor-pointer"
+            className="text-xs text-slate-500 hover:text-slate-900 underline cursor-pointer font-medium"
           >
             Limpar filtro
           </button>
@@ -151,4 +151,3 @@ export const FinancialFilters: React.FC<FinancialFiltersProps> = ({
     </div>
   );
 };
-

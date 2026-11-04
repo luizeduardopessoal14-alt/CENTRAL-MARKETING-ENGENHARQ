@@ -118,3 +118,4 @@ export interface DashboardFullData {
   operational: OperationalQuickData;
   updatedAt: string;
 }
+

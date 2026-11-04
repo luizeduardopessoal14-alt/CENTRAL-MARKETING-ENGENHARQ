@@ -294,7 +294,7 @@ export const ConteudosView: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-red-50 text-[#DE3A39] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-red-50 text-[#B21010] flex items-center justify-center">
                 <Layers className="w-4 h-4" />
               </div>
               <h1 className="text-lg font-bold text-[#373535]">
@@ -365,7 +365,7 @@ export const ConteudosView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsQuickIdeaOpen(true)}
-                className="px-3.5 py-2 rounded-lg text-xs font-semibold text-white bg-[#DE3A39] hover:bg-[#C52B2A] transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                className="px-3.5 py-2 rounded-lg text-xs font-semibold text-white bg-[#B21010] hover:bg-[#8F0D0D] transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Nova Ideia</span>
@@ -385,7 +385,7 @@ export const ConteudosView: React.FC = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Buscar por título ou descrição..."
-                className="w-full pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#DE3A39] transition-all"
+                className="w-full pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#B21010] transition-all"
               />
             </div>
 
@@ -393,7 +393,7 @@ export const ConteudosView: React.FC = () => {
             <select
               value={assignedFilter}
               onChange={(e) => setAssignedFilter(e.target.value)}
-              className="px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#DE3A39] transition-all"
+              className="px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#B21010] transition-all"
             >
               <option value="">Todos os responsáveis</option>
               {users.map((u) => (
@@ -443,7 +443,7 @@ export const ConteudosView: React.FC = () => {
       <div className="flex-1 overflow-x-auto p-6">
         {isLoading ? (
           <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-2">
-            <div className="w-8 h-8 border-2 border-[#DE3A39]/30 border-t-[#DE3A39] rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-[#B21010]/30 border-t-[#B21010] rounded-full animate-spin" />
             <p className="text-xs">Carregando quadro de conteúdos...</p>
           </div>
         ) : error ? (
@@ -474,7 +474,7 @@ export const ConteudosView: React.FC = () => {
                   onDrop={(e) => handleDrop(e, column.id)}
                   className={`flex-1 flex flex-col max-h-full bg-gray-100/70 rounded-2xl border transition-all ${
                     isDropTarget
-                      ? 'border-[#DE3A39] ring-2 ring-[#DE3A39]/20 bg-red-50/20'
+                      ? 'border-[#B21010] ring-2 ring-[#B21010]/20 bg-red-50/20'
                       : 'border-gray-200/70'
                   }`}
                   style={{ minWidth: '220px', maxWidth: '280px' }}

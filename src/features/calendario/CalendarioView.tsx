@@ -285,7 +285,7 @@ export const CalendarioView: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-red-50 text-[#DE3A39] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-red-50 text-[#B21010] flex items-center justify-center">
                 <CalendarIcon className="w-4 h-4" />
               </div>
               <h1 className="text-lg font-bold text-[#373535]">Calendário Geral</h1>
@@ -312,7 +312,7 @@ export const CalendarioView: React.FC = () => {
             </div>
 
             <div className="px-3 py-1.5 rounded-lg bg-red-50/70 border border-red-200/60 text-xs">
-              <span className="text-[#DE3A39] block text-[10px] font-medium uppercase">
+              <span className="text-[#B21010] block text-[10px] font-medium uppercase">
                 Eventos
               </span>
               <span className="font-bold text-red-900">{metrics.eventsThisMonth}</span>
@@ -338,7 +338,7 @@ export const CalendarioView: React.FC = () => {
                   setSelectedDateForNew(undefined);
                   setIsEventModalOpen(true);
                 }}
-                className="px-3.5 py-2 rounded-lg text-xs font-semibold text-white bg-[#DE3A39] hover:bg-[#C52B2A] transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                className="px-3.5 py-2 rounded-lg text-xs font-semibold text-white bg-[#B21010] hover:bg-[#8F0D0D] transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Novo Compromisso</span>
@@ -392,7 +392,7 @@ export const CalendarioView: React.FC = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Buscar compromisso..."
-                className="w-full pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#DE3A39] transition-all"
+                className="w-full pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#B21010] transition-all"
               />
             </div>
 
@@ -426,11 +426,11 @@ export const CalendarioView: React.FC = () => {
                 onClick={() => setTypeFilter('evento')}
                 className={`px-2.5 py-1 rounded-md font-medium transition-all cursor-pointer flex items-center gap-1 ${
                   typeFilter === 'evento'
-                    ? 'bg-white text-[#DE3A39] shadow-xs font-semibold'
+                    ? 'bg-white text-[#B21010] shadow-xs font-semibold'
                     : 'text-gray-500 hover:text-gray-800'
                 }`}
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-[#DE3A39]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#B21010]" />
                 <span>Eventos</span>
               </button>
             </div>
@@ -470,7 +470,7 @@ export const CalendarioView: React.FC = () => {
       <div className="flex-1 overflow-y-auto p-6">
         {isLoading ? (
           <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-2 py-16">
-            <div className="w-8 h-8 border-2 border-[#DE3A39]/30 border-t-[#DE3A39] rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-[#B21010]/30 border-t-[#B21010] rounded-full animate-spin" />
             <p className="text-xs">Carregando calendário...</p>
           </div>
         ) : error ? (
@@ -522,7 +522,7 @@ export const CalendarioView: React.FC = () => {
                       <span
                         className={`text-xs font-semibold w-6 h-6 flex items-center justify-center rounded-full ${
                           day.isToday
-                            ? 'bg-[#DE3A39] text-white font-bold shadow-xs'
+                            ? 'bg-[#B21010] text-white font-bold shadow-xs'
                             : day.isCurrentMonth
                             ? 'text-[#373535]'
                             : 'text-gray-400'
@@ -532,7 +532,7 @@ export const CalendarioView: React.FC = () => {
                       </span>
 
                       {canEdit && day.isCurrentMonth && (
-                        <span className="opacity-0 group-hover:opacity-100 text-[10px] text-gray-400 hover:text-[#DE3A39] p-0.5 transition-opacity">
+                        <span className="opacity-0 group-hover:opacity-100 text-[10px] text-gray-400 hover:text-[#B21010] p-0.5 transition-opacity">
                           <Plus className="w-3 h-3" />
                         </span>
                       )}
@@ -549,7 +549,7 @@ export const CalendarioView: React.FC = () => {
                             className={`px-1.5 py-1 rounded-md text-[10px] font-medium border truncate transition-all cursor-pointer ${
                               isReuniao
                                 ? 'bg-blue-50/90 text-blue-800 border-blue-200 hover:bg-blue-100'
-                                : 'bg-red-50/90 text-[#DE3A39] border-red-200 hover:bg-red-100'
+                                : 'bg-red-50/90 text-[#B21010] border-red-200 hover:bg-red-100'
                             }`}
                             title={`${evt.title} ${evt.start_time ? `(${evt.start_time.slice(0, 5)})` : ''}`}
                           >
@@ -584,7 +584,7 @@ export const CalendarioView: React.FC = () => {
                       setSelectedDateForNew(undefined);
                       setIsEventModalOpen(true);
                     }}
-                    className="mt-2 px-4 py-2 bg-[#DE3A39] text-white rounded-lg text-xs font-semibold hover:bg-[#C52B2A] transition-colors cursor-pointer"
+                    className="mt-2 px-4 py-2 bg-[#B21010] text-white rounded-lg text-xs font-semibold hover:bg-[#8F0D0D] transition-colors cursor-pointer"
                   >
                     + Criar Novo Compromisso
                   </button>
@@ -608,7 +608,7 @@ export const CalendarioView: React.FC = () => {
                         className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
                           isReuniao
                             ? 'bg-blue-50 text-blue-600'
-                            : 'bg-red-50 text-[#DE3A39]'
+                            : 'bg-red-50 text-[#B21010]'
                         }`}
                       >
                         {isReuniao ? (
@@ -624,12 +624,12 @@ export const CalendarioView: React.FC = () => {
                             className={`text-[10px] px-2 py-0.5 rounded-md font-semibold border ${
                               isReuniao
                                 ? 'bg-blue-50 text-blue-700 border-blue-200'
-                                : 'bg-red-50 text-[#DE3A39] border-red-200'
+                                : 'bg-red-50 text-[#B21010] border-red-200'
                             }`}
                           >
                             {isReuniao ? 'Reunião' : 'Evento'}
                           </span>
-                          <h4 className="text-xs font-bold text-[#373535] group-hover:text-[#DE3A39] transition-colors truncate">
+                          <h4 className="text-xs font-bold text-[#373535] group-hover:text-[#B21010] transition-colors truncate">
                             {evt.title}
                           </h4>
                         </div>

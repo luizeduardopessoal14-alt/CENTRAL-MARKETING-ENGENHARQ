@@ -15,7 +15,7 @@ import {
 } from '../types/dashboard';
 
 const CATEGORY_COLORS: Record<string, string> = {
-  'Eventos & Feirões': '#DE3A39',
+  'Eventos & Feirões': '#B21010',
   'Mídia Paga & Anúncios': '#3B82F6',
   'Gráfica & Comunicação Visual': '#10B981',
   'Brindes, Camisas & Uniformes': '#F59E0B',
@@ -543,7 +543,7 @@ export const dashboardAnalyticsService = {
         stageName: 'Cadastros Recebidos',
         count: totalLeads,
         percentageFromTop: 100,
-        color: '#DE3A39', // EngenhArq Red
+        color: '#B21010', // EngenhArq Red Institutional
       },
       {
         stageKey: 'atendimento',
@@ -646,3 +646,4 @@ export const dashboardAnalyticsService = {
     };
   },
 };
+

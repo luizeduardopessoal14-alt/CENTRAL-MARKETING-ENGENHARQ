@@ -153,7 +153,7 @@ export const MetaConfigModal: React.FC<MetaConfigModalProps> = ({
                   value={adAccountId}
                   onChange={(e) => setAdAccountId(e.target.value)}
                   placeholder="Ex: act_123456789012345 ou 123456789012345"
-                  className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#DE3A39] transition-all disabled:opacity-70"
+                  className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#B21010] transition-all disabled:opacity-70"
                 />
               </div>
               <span className="text-[10px] text-gray-400 mt-1 block">
@@ -173,7 +173,7 @@ export const MetaConfigModal: React.FC<MetaConfigModalProps> = ({
                 value={instagramId}
                 onChange={(e) => setInstagramId(e.target.value)}
                 placeholder="Ex: 17841400000000000"
-                className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#DE3A39] transition-all disabled:opacity-70"
+                className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#B21010] transition-all disabled:opacity-70"
               />
               <span className="text-[10px] text-gray-400 mt-1 block">
                 Identificador da conta profissional do Instagram no Meta Business Suite.
@@ -217,7 +217,7 @@ export const MetaConfigModal: React.FC<MetaConfigModalProps> = ({
               type="submit"
               form="metaConfigForm"
               disabled={isSubmitting}
-              className="px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#DE3A39] hover:bg-[#C52B2A] transition-all shadow-xs disabled:opacity-60 cursor-pointer flex items-center gap-1.5"
+              className="px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#B21010] hover:bg-[#8F0D0D] transition-all shadow-xs disabled:opacity-60 cursor-pointer flex items-center gap-1.5"
             >
               {isSubmitting ? 'Salvando...' : 'Salvar Identificadores'}
             </button>

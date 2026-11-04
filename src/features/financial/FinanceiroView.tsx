@@ -137,7 +137,7 @@ export const FinanceiroView: React.FC = () => {
             {feedback.type === 'success' ? (
               <CheckCircle2 className="w-5 h-5 text-emerald-600" />
             ) : (
-              <AlertTriangle className="w-5 h-5 text-[#DE3A39]" />
+              <AlertTriangle className="w-5 h-5 text-[#B21010]" />
             )}
             <span className="text-sm font-medium">{feedback.text}</span>
           </div>

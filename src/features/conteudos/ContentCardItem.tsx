@@ -118,7 +118,7 @@ export const ContentCardItem: React.FC<ContentCardItemProps> = ({
                           setMenuOpen(false);
                           onQuickMove(card, col.id);
                         }}
-                        className="w-full px-3 py-1 text-left text-xs text-gray-600 hover:bg-gray-50 hover:text-[#DE3A39] flex items-center justify-between cursor-pointer"
+                        className="w-full px-3 py-1 text-left text-xs text-gray-600 hover:bg-gray-50 hover:text-[#B21010] flex items-center justify-between cursor-pointer"
                       >
                         <span>{col.title}</span>
                         <ArrowRight className="w-3 h-3 text-gray-300" />

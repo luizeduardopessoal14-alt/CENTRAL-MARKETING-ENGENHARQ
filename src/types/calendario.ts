@@ -33,8 +33,8 @@ export const EVENT_TYPES: { id: CalendarEventType; label: string; color: string;
   {
     id: 'evento',
     label: 'Evento',
-    color: '#DE3A39',
-    badgeClass: 'bg-red-50 text-[#DE3A39] border-red-200',
+    color: '#B21010',
+    badgeClass: 'bg-red-50 text-[#B21010] border-red-200',
   },
 ];
 

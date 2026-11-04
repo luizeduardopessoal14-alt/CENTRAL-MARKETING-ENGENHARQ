@@ -184,7 +184,7 @@ export const FinancialRecordModal: React.FC<FinancialRecordModalProps> = ({
                 placeholder="Ex: Gráfica Express"
                 value={supplier}
                 onChange={(e) => setSupplier(e.target.value)}
-                className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE3A39]"
+                className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B21010]"
               />
             </div>
             <div>
@@ -199,7 +199,7 @@ export const FinancialRecordModal: React.FC<FinancialRecordModalProps> = ({
                 placeholder="0.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE3A39]"
+                className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B21010]"
               />
             </div>
           </div>
@@ -215,7 +215,7 @@ export const FinancialRecordModal: React.FC<FinancialRecordModalProps> = ({
               placeholder="Ex: 5.000 Panfletos A5 - Lançamento Coqueirais"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE3A39]"
+              className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B21010]"
             />
           </div>
 
@@ -228,7 +228,7 @@ export const FinancialRecordModal: React.FC<FinancialRecordModalProps> = ({
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE3A39] bg-white"
+                className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B21010] bg-white"
               >
                 {FINANCIAL_CATEGORIES.map((c) => (
                   <option key={c} value={c}>
@@ -246,7 +246,7 @@ export const FinancialRecordModal: React.FC<FinancialRecordModalProps> = ({
                 required
                 value={receiptDate}
                 onChange={(e) => setReceiptDate(e.target.value)}
-                className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE3A39]"
+                className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B21010]"
               />
             </div>
           </div>
@@ -261,7 +261,7 @@ export const FinancialRecordModal: React.FC<FinancialRecordModalProps> = ({
               placeholder="Ex: NF-e 10425"
               value={invoiceNumber}
               onChange={(e) => setInvoiceNumber(e.target.value)}
-              className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE3A39]"
+              className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B21010]"
             />
           </div>
 
@@ -293,7 +293,7 @@ export const FinancialRecordModal: React.FC<FinancialRecordModalProps> = ({
 
               {(selectedFile || attachmentName) && (
                 <div className="flex items-center gap-1.5 text-xs text-gray-600 truncate">
-                  <FileText className="w-3.5 h-3.5 text-[#DE3A39]" />
+                  <FileText className="w-3.5 h-3.5 text-[#B21010]" />
                   <span className="truncate max-w-[250px]">
                     {selectedFile ? selectedFile.name : attachmentName}
                   </span>
@@ -312,7 +312,7 @@ export const FinancialRecordModal: React.FC<FinancialRecordModalProps> = ({
               placeholder="Ex: Condição de pagamento combinada, detalhes adicionais..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE3A39]"
+              className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B21010]"
             />
           </div>
 
@@ -329,7 +329,7 @@ export const FinancialRecordModal: React.FC<FinancialRecordModalProps> = ({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 bg-[#DE3A39] hover:bg-[#C52B2A] text-white text-xs font-semibold rounded-lg shadow-sm transition-all cursor-pointer disabled:opacity-60"
+              className="px-4 py-2 bg-[#B21010] hover:bg-[#8F0D0D] text-white text-xs font-semibold rounded-lg shadow-sm transition-all cursor-pointer disabled:opacity-60"
             >
               {isSubmitting ? 'Salvando...' : recordToEdit ? 'Atualizar Cobrança' : 'Cadastrar Cobrança'}
             </button>

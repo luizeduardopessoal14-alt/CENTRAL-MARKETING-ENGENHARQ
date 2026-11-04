@@ -249,7 +249,7 @@ export const AdminView: React.FC = () => {
             {feedbackMessage.type === 'success' ? (
               <CheckCircle2 className="w-5 h-5 text-emerald-600" />
             ) : (
-              <AlertTriangle className="w-5 h-5 text-[#DE3A39]" />
+              <AlertTriangle className="w-5 h-5 text-[#B21010]" />
             )}
             <span className="text-sm font-medium">{feedbackMessage.text}</span>
           </div>
@@ -271,7 +271,7 @@ export const AdminView: React.FC = () => {
 
         <button
           onClick={() => setIsCreateModalOpen(true)}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#DE3A39] hover:bg-[#C52B2A] text-white text-sm font-semibold rounded-lg shadow-sm transition-all"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#B21010] hover:bg-[#8F0D0D] text-white text-sm font-semibold rounded-lg shadow-sm transition-all"
         >
           <UserPlus className="w-4 h-4" />
           <span>Cadastrar Usuário</span>
@@ -288,7 +288,7 @@ export const AdminView: React.FC = () => {
                 placeholder="Buscar por nome ou usuário..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3.5 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE3A39] focus:border-transparent"
+                className="w-full pl-9 pr-3.5 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B21010] focus:border-transparent"
               />
             </div>
             <button
@@ -338,7 +338,7 @@ export const AdminView: React.FC = () => {
                         </td>
                         <td className="py-3.5 px-4">
                           {isSuper ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-[#DE3A39] border border-red-200">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-[#B21010] border border-red-200">
                               <Shield className="w-3 h-3" />
                               Superadmin
                             </span>
@@ -381,7 +381,7 @@ export const AdminView: React.FC = () => {
                                   }
                                   className={`text-xs font-medium rounded-md px-2 py-1 border transition-colors cursor-pointer ${
                                     currentLevel === 'edicao'
-                                      ? 'bg-red-50 text-[#DE3A39] border-red-200'
+                                      ? 'bg-red-50 text-[#B21010] border-red-200'
                                       : currentLevel === 'consulta'
                                       ? 'bg-blue-50 text-blue-700 border-blue-200'
                                       : 'bg-gray-50 text-gray-400 border-gray-200'
@@ -415,7 +415,7 @@ export const AdminView: React.FC = () => {
                               title={u.is_active ? 'Desativar usuário' : 'Reativar usuário'}
                               className={`p-1.5 rounded-md transition-colors ${
                                 u.is_active
-                                  ? 'text-gray-400 hover:text-[#DE3A39] hover:bg-red-50'
+                                  ? 'text-gray-400 hover:text-[#B21010] hover:bg-red-50'
                                   : 'text-gray-400 hover:text-emerald-600 hover:bg-emerald-50'
                               }`}
                             >
@@ -457,7 +457,7 @@ export const AdminView: React.FC = () => {
                   placeholder="Ex: Flávia Coordenadora"
                   value={createForm.full_name}
                   onChange={(e) => setCreateForm({ ...createForm, full_name: e.target.value })}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE3A39]"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B21010]"
                 />
               </div>
 
@@ -472,7 +472,7 @@ export const AdminView: React.FC = () => {
                     placeholder="Ex: Flavia Mkt"
                     value={createForm.username}
                     onChange={(e) => setCreateForm({ ...createForm, username: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE3A39]"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B21010]"
                   />
                 </div>
                 <div>
@@ -485,7 +485,7 @@ export const AdminView: React.FC = () => {
                     placeholder="Mínimo 6 dígitos"
                     value={createForm.password}
                     onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE3A39]"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B21010]"
                   />
                 </div>
               </div>
@@ -497,7 +497,7 @@ export const AdminView: React.FC = () => {
                 <select
                   value={createForm.role}
                   onChange={(e) => setCreateForm({ ...createForm, role: e.target.value as 'user' | 'superadmin' })}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE3A39]"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B21010]"
                 >
                   <option value="user">Usuário Comum (Permissões por aba)</option>
                   <option value="superadmin">Superadministrador (Acesso total)</option>
@@ -549,7 +549,7 @@ export const AdminView: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#DE3A39] hover:bg-[#C52B2A] text-white text-sm font-semibold rounded-lg shadow-sm transition-all"
+                  className="px-4 py-2 bg-[#B21010] hover:bg-[#8F0D0D] text-white text-sm font-semibold rounded-lg shadow-sm transition-all"
                 >
                   Criar Conta
                 </button>
@@ -589,7 +589,7 @@ export const AdminView: React.FC = () => {
                   placeholder="Mínimo 6 dígitos"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DE3A39]"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B21010]"
                 />
               </div>
 
@@ -603,7 +603,7 @@ export const AdminView: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#DE3A39] hover:bg-[#C52B2A] text-white text-sm font-semibold rounded-lg shadow-sm transition-all"
+                  className="px-4 py-2 bg-[#B21010] hover:bg-[#8F0D0D] text-white text-sm font-semibold rounded-lg shadow-sm transition-all"
                 >
                   Confirmar Nova Senha
                 </button>

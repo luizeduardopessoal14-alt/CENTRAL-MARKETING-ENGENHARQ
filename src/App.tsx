@@ -17,16 +17,33 @@ import { ShieldAlert } from 'lucide-react';
 const MainLayout: React.FC = () => {
   const { user, isLoading, hasAccess } = useAuth();
   const [currentTab, setCurrentTab] = useState<AppArea | 'admin'>('visao_geral');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('sidebar_collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const handleToggleSidebar = () => {
+    setIsSidebarCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('sidebar_collapsed', String(next));
+      } catch {}
+      return next;
+    });
+  };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F8F9FA]">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F8F9FB]">
         <img
           src="/Assets/logoENG.svg"
           alt="EngenhArq Logo"
           className="h-10 w-auto mb-4 animate-pulse"
         />
-        <div className="w-6 h-6 border-2 border-[#DE3A39]/30 border-t-[#DE3A39] rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#B21010]/30 border-t-[#B21010] rounded-full animate-spin" />
       </div>
     );
   }
@@ -42,11 +59,13 @@ const MainLayout: React.FC = () => {
     (currentTab === 'admin' ? isSuperadmin : hasAccess(currentTab, 'consulta'));
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#F8F9FA]">
-      {/* Barra Lateral Fixa */}
+    <div className="flex h-screen overflow-hidden bg-[#F8F9FB]">
+      {/* Barra Lateral Retrátil */}
       <Sidebar
         currentTab={currentTab}
         onSelectTab={(tab) => setCurrentTab(tab)}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={handleToggleSidebar}
       />
 
       {/* Área Principal de Conteúdo */}
@@ -56,16 +75,16 @@ const MainLayout: React.FC = () => {
         <main className="flex-1 overflow-y-auto">
           {!isAllowed ? (
             <div className="p-12 max-w-lg mx-auto text-center space-y-3">
-              <div className="w-12 h-12 rounded-full bg-red-50 text-[#DE3A39] flex items-center justify-center mx-auto">
+              <div className="w-12 h-12 rounded-full bg-red-50 text-[#B21010] flex items-center justify-center mx-auto">
                 <ShieldAlert className="w-6 h-6" />
               </div>
-              <h2 className="text-lg font-bold text-[#373535]">Acesso Restrito</h2>
-              <p className="text-sm text-gray-500">
+              <h2 className="text-lg font-bold text-slate-800">Acesso Restrito</h2>
+              <p className="text-sm text-slate-500">
                 Você não possui permissão para visualizar esta área. Solicite liberação ao Superadministrador.
               </p>
               <button
                 onClick={() => setCurrentTab('visao_geral')}
-                className="mt-4 px-4 py-2 bg-gray-900 text-white rounded-lg text-xs font-semibold hover:bg-gray-800 transition-colors cursor-pointer"
+                className="mt-4 px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-semibold hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 Voltar à Visão Geral
               </button>

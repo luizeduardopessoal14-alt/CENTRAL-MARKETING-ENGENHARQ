@@ -126,7 +126,7 @@ export const MidiaView: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-red-50 text-[#DE3A39] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-red-50 text-[#B21010] flex items-center justify-center">
                 <Megaphone className="w-4 h-4" />
               </div>
               <h1 className="text-lg font-bold text-[#373535]">Mídia & Campanhas</h1>
@@ -206,7 +206,7 @@ export const MidiaView: React.FC = () => {
               <select
                 value={objectiveFilter}
                 onChange={(e) => setObjectiveFilter(e.target.value as CampaignObjectiveFilter)}
-                className="px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#DE3A39] transition-all"
+                className="px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg text-[#373535] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#B21010] transition-all"
               >
                 {CAMPAIGN_OBJECTIVES.map((obj) => (
                   <option key={obj.id} value={obj.id}>
@@ -237,7 +237,7 @@ export const MidiaView: React.FC = () => {
       <div className="p-6 space-y-6 max-w-7xl mx-auto w-full">
         {isLoading ? (
           <div className="py-20 flex flex-col items-center justify-center text-gray-400 space-y-2">
-            <div className="w-8 h-8 border-2 border-[#DE3A39]/30 border-t-[#DE3A39] rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-[#B21010]/30 border-t-[#B21010] rounded-full animate-spin" />
             <p className="text-xs">Carregando métricas de mídia...</p>
           </div>
         ) : (
@@ -335,7 +335,7 @@ export const MidiaView: React.FC = () => {
                   <span className="text-[10px] font-bold uppercase tracking-wider">
                     Cadastros Gerados (Leads)
                   </span>
-                  <div className="p-1.5 rounded-lg bg-red-50 text-[#DE3A39]">
+                  <div className="p-1.5 rounded-lg bg-red-50 text-[#B21010]">
                     <Target className="w-4 h-4" />
                   </div>
                 </div>
