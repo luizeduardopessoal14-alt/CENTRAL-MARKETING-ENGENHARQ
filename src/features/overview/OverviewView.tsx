@@ -1,389 +1,184 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { AppArea } from '../../types/auth';
-import { FinancialTotals } from '../../types/financeiro';
-import { financialService } from '../../services/financialService';
-import { contentService } from '../../services/contentService';
-import { calendarService } from '../../services/calendarService';
-import { midiaService } from '../../services/midiaService';
-import { imobiliariaService } from '../../services/imobiliariaService';
-import { calculateDueDateAlert } from '../../types/conteudos';
-import { CalendarOverviewMetrics } from '../../types/calendario';
-import { MetaIntegrationConfig, MetaOverviewTotals } from '../../types/midia';
-import { CVCRMIntegrationConfig, AgencyMetricsMonthly } from '../../types/imobiliarias';
-import {
-  DollarSign,
-  Kanban,
-  Calendar,
-  Megaphone,
-  Building2,
-  ArrowRight,
-} from 'lucide-react';
+import { DashboardPeriodMode, DashboardFullData } from '../../types/dashboard';
+import { dashboardAnalyticsService } from '../../services/dashboardAnalyticsService';
+import { DashboardFilters } from './DashboardFilters';
+import { DashboardKpiCards } from './DashboardKpiCards';
+import { FinancialAnalyticsSection } from './FinancialAnalyticsSection';
+import { LeadsAnalyticsSection } from './LeadsAnalyticsSection';
+import { MediaEfficiencySection } from './MediaEfficiencySection';
+import { OperationalQuickSection } from './OperationalQuickSection';
+import { AlertCircle } from 'lucide-react';
 
 interface OverviewViewProps {
   onNavigate: (tab: AppArea) => void;
 }
 
 export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
-  const { hasAccess } = useAuth();
-  const [financialTotals, setFinancialTotals] = useState<FinancialTotals>({
-    totalOpen: 0,
-    totalNoForecast: 0,
-    totalWeekForecast: 0,
-    totalPaidMonth: 0,
-    countConsultFinance: 0,
-  });
+  const { hasAccess, user } = useAuth();
+  const isSuperadmin = user?.role === 'superadmin';
 
-  const [contentTotals, setContentTotals] = useState({
-    inProduction: 0,
-    inApproval: 0,
-    overdueCount: 0,
-  });
+  // Permissões por área
+  const canViewFinancial = isSuperadmin || hasAccess('financeiro', 'consulta');
+  const canViewLeads = isSuperadmin || hasAccess('imobiliarias', 'consulta');
+  const canViewMedia = isSuperadmin || hasAccess('midia', 'consulta');
+  const canViewContent = isSuperadmin || hasAccess('conteudos', 'consulta');
+  const canViewCalendar = isSuperadmin || hasAccess('calendario', 'consulta');
 
-  const [calendarMetrics, setCalendarMetrics] = useState<CalendarOverviewMetrics>({
-    nextEvents: [],
-    meetingsThisWeekCount: 0,
-    eventsThisMonthCount: 0,
-  });
+  // Estados dos Slicers / Filtros Globais
+  const [periodMode, setPeriodMode] = useState<DashboardPeriodMode>('este_mes');
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
 
-  const [metaConfig, setMetaConfig] = useState<MetaIntegrationConfig | null>(null);
-  const [metaTotals, setMetaTotals] = useState<MetaOverviewTotals>({
-    totalSpend: 0,
-    totalLeads: 0,
-    avgCostPerLead: null,
-    totalReach: 0,
-    totalImpressions: 0,
-    avgCpm: null,
-    prevPeriodSpend: 0,
-    prevPeriodLeads: 0,
-    prevPeriodCpl: null,
-  });
+  // Dados do Dashboard
+  const [dashboardData, setDashboardData] = useState<DashboardFullData | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const [cvcrmConfig, setCvcrmConfig] = useState<CVCRMIntegrationConfig | null>(null);
-  const [imobiliariaTotals, setImobiliariaTotals] = useState({
-    leads: 0,
-    sales: 0,
-    conversionRate: 0,
-  });
+  // Inicializar datas conforme o modo
+  useEffect(() => {
+    const range = dashboardAnalyticsService.calculateDateRange(periodMode, startDate, endDate);
+    if (periodMode !== 'personalizado') {
+      setStartDate(range.startDate);
+      setEndDate(range.endDate);
+    }
+  }, [periodMode]);
+
+  // Carregar dados
+  const loadData = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await dashboardAnalyticsService.getFullDashboardData(
+        periodMode,
+        startDate,
+        endDate
+      );
+      setDashboardData(data);
+    } catch (err: unknown) {
+      console.error('Erro ao carregar métricas do dashboard:', err);
+      setError('Falha ao processar dados do painel analítico.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [periodMode, startDate, endDate]);
 
   useEffect(() => {
-    if (hasAccess('financeiro', 'consulta')) {
-      financialService
-        .getTotals()
-        .then(setFinancialTotals)
-        .catch((err) => console.error('Erro ao buscar totais financeiros na visão geral:', err));
-    }
-
-    if (hasAccess('conteudos', 'consulta')) {
-      contentService.fetchCards().then((res) => {
-        if (res.data) {
-          let inProduction = 0;
-          let inApproval = 0;
-          let overdueCount = 0;
-
-          res.data.forEach((card) => {
-            if (card.column_status === 'em_producao') inProduction++;
-            if (card.column_status === 'em_aprovacao') inApproval++;
-            const alert = calculateDueDateAlert(card.due_date, card.column_status);
-            if (alert.type === 'atrasado') overdueCount++;
-          });
-
-          setContentTotals({ inProduction, inApproval, overdueCount });
-        }
-      });
-    }
-
-    if (hasAccess('calendario', 'consulta')) {
-      calendarService.getOverviewMetrics().then(setCalendarMetrics);
-    }
-
-    if (hasAccess('midia', 'consulta')) {
-      midiaService.getConfig().then((res) => setMetaConfig(res.data));
-      midiaService.getCampaignInsights('este_mes', 'todos').then((res) => {
-        const totals = midiaService.calculateTotals(res.data, res.prevData);
-        setMetaTotals(totals);
-      });
-    }
-
-    if (hasAccess('imobiliarias', 'consulta')) {
-      imobiliariaService.getConfig().then(setCvcrmConfig);
-      imobiliariaService.getMonthlyMetrics().then((metrics: AgencyMetricsMonthly[]) => {
-        const leads = metrics.reduce((sum: number, m: AgencyMetricsMonthly) => sum + m.leads_received, 0);
-        const sales = metrics.reduce((sum: number, m: AgencyMetricsMonthly) => sum + m.sales, 0);
-        const conversionRate = leads > 0 ? (sales / leads) * 100 : 0;
-        setImobiliariaTotals({ leads, sales, conversionRate });
-      });
-    }
-  }, [hasAccess]);
-
-  const formatCurrency = (val: number) =>
-    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+    loadData();
+  }, [loadData]);
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8">
-      {/* Banner de Boas-vindas */}
-      <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto space-y-6">
+      {/* Banner de Cabeçalho Executivo */}
+      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-gray-200/90 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-[#DE3A39]">
-            Painel Executivo
-          </span>
-          <h2 className="text-2xl font-bold text-[#373535] mt-0.5">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#DE3A39] animate-pulse" />
+            <span className="text-xs font-bold uppercase tracking-wider text-[#DE3A39]">
+              Painel Analítico Executivo
+            </span>
+          </div>
+          <h2 className="text-xl sm:text-2xl font-black text-[#373535] mt-1 tracking-tight">
             Central de Marketing EngenhArq
           </h2>
-          <p className="text-sm text-gray-500 mt-1">
-            Acompanhamento centralizado de despesas, pautas, eventos e resultados da construtora.
+          <p className="text-xs sm:text-sm text-gray-400 mt-1">
+            Indicadores de performance financeira, esteiras de leads do CVCRM e eficiência de campanhas em tempo real.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-medium text-gray-600">
+
+        <div className="flex items-center gap-2 self-start md:self-auto">
+          <div className="px-3 py-1.5 bg-gray-50 border border-gray-200/80 rounded-xl text-xs font-medium text-gray-600">
             Fuso: <strong>São Paulo (BRT)</strong>
           </div>
         </div>
       </div>
 
-      {/* Grid de Cards Resumo (Mostra apenas áreas com acesso) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Card: Financeiro */}
-        {hasAccess('financeiro') && (
-          <div
-            onClick={() => onNavigate('financeiro')}
-            className="bg-white rounded-xl p-5 border border-gray-200 shadow-xs hover:shadow-md hover:border-gray-300 transition-all cursor-pointer group flex flex-col justify-between"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
-                  Financeiro
-                </span>
-                <div className="p-2 bg-red-50 text-[#DE3A39] rounded-lg group-hover:scale-105 transition-transform">
-                  <DollarSign className="w-5 h-5" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between items-baseline">
-                  <span className="text-xs text-gray-500">Em aberto (geral):</span>
-                  <span className="text-sm font-bold text-[#373535]">
-                    {formatCurrency(financialTotals.totalOpen)}
-                  </span>
-                </div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-xs text-gray-500">Sem previsão:</span>
-                  <span className="text-xs font-semibold text-amber-600">
-                    {formatCurrency(financialTotals.totalNoForecast)}
-                  </span>
-                </div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-xs text-gray-500">Pago no mês:</span>
-                  <span className="text-xs font-semibold text-emerald-600">
-                    {formatCurrency(financialTotals.totalPaidMonth)}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-[#DE3A39]">
-              <span>Abrir Financeiro</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </div>
-        )}
+      {/* Segmentador de Dados Global (Slicers estilo Power BI) */}
+      <DashboardFilters
+        periodMode={periodMode}
+        onPeriodModeChange={(m) => setPeriodMode(m)}
+        startDate={startDate}
+        endDate={endDate}
+        onStartDateChange={(d) => setStartDate(d)}
+        onEndDateChange={(d) => setEndDate(d)}
+        isLoading={isLoading}
+        onRefresh={loadData}
+        lastUpdated={dashboardData?.updatedAt || ''}
+      />
 
-        {/* Card: Conteúdos (Kanban) */}
-        {hasAccess('conteudos') && (
-          <div
-            onClick={() => onNavigate('conteudos')}
-            className="bg-white rounded-xl p-5 border border-gray-200 shadow-xs hover:shadow-md hover:border-gray-300 transition-all cursor-pointer group flex flex-col justify-between"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
-                  Conteúdos (Redes Sociais)
-                </span>
-                <div className="p-2 bg-blue-50 text-blue-600 rounded-lg group-hover:scale-105 transition-transform">
-                  <Kanban className="w-5 h-5" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between items-baseline">
-                  <span className="text-xs text-gray-500">Em produção:</span>
-                  <span className="text-sm font-bold text-[#373535]">
-                    {contentTotals.inProduction}
-                  </span>
-                </div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-xs text-gray-500">Em aprovação (Flávia):</span>
-                  <span className="text-xs font-semibold text-purple-600">
-                    {contentTotals.inApproval}
-                  </span>
-                </div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-xs text-gray-500">Alertas de atraso:</span>
-                  <span
-                    className={`text-xs font-semibold ${
-                      contentTotals.overdueCount > 0
-                        ? 'text-red-600'
-                        : 'text-emerald-600'
-                    }`}
-                  >
-                    {contentTotals.overdueCount > 0
-                      ? `${contentTotals.overdueCount} atrasado(s)`
-                      : 'Nenhum atrasado'}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-[#DE3A39]">
-              <span>Abrir Quadro de Conteúdos</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </div>
-        )}
+      {/* Tratamento de Erro */}
+      {error && (
+        <div className="p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-3 text-xs text-red-700">
+          <AlertCircle className="w-4 h-4 text-[#DE3A39] flex-shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
 
-        {/* Card: Calendário Geral */}
-        {hasAccess('calendario') && (
-          <div
-            onClick={() => onNavigate('calendario')}
-            className="bg-white rounded-xl p-5 border border-gray-200 shadow-xs hover:shadow-md hover:border-gray-300 transition-all cursor-pointer group flex flex-col justify-between"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
-                  Calendário Geral
-                </span>
-                <div className="p-2 bg-amber-50 text-amber-600 rounded-lg group-hover:scale-105 transition-transform">
-                  <Calendar className="w-5 h-5" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between items-baseline">
-                  <span className="text-xs text-gray-500">Próximo compromisso:</span>
-                  <span className="text-xs font-bold text-[#373535] truncate max-w-[170px]" title={calendarMetrics.nextEvents[0]?.title}>
-                    {calendarMetrics.nextEvents.length > 0
-                      ? `${calendarMetrics.nextEvents[0].title} (${calendarMetrics.nextEvents[0].event_date.split('-').reverse().slice(0, 2).join('/')})`
-                      : 'Nenhum agendado'}
-                  </span>
-                </div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-xs text-gray-500">Reuniões esta semana:</span>
-                  <span className="text-xs font-semibold text-blue-600">
-                    {calendarMetrics.meetingsThisWeekCount}
-                  </span>
-                </div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-xs text-gray-500">Eventos no mês:</span>
-                  <span className="text-xs font-semibold text-[#DE3A39]">
-                    {calendarMetrics.eventsThisMonthCount}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-[#DE3A39]">
-              <span>Abrir Calendário</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </div>
+      {/* Estado de Carregamento com Esqueleto */}
+      {isLoading && !dashboardData ? (
+        <div className="space-y-6 animate-pulse">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="h-28 bg-gray-100 rounded-2xl" />
+            ))}
           </div>
-        )}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 h-72 bg-gray-100 rounded-2xl" />
+            <div className="h-72 bg-gray-100 rounded-2xl" />
+          </div>
+        </div>
+      ) : dashboardData ? (
+        <div className="space-y-8 animate-fadeIn">
+          {/* Faixa Superior: 5 KPI Cards Estilo Power BI */}
+          <DashboardKpiCards
+            financial={dashboardData.financial}
+            leads={dashboardData.leads}
+            media={dashboardData.media}
+          />
 
-        {/* Card: Mídia e Campanhas */}
-        {hasAccess('midia') && (
-          <div
-            onClick={() => onNavigate('midia')}
-            className="bg-white rounded-xl p-5 border border-gray-200 shadow-xs hover:shadow-md hover:border-gray-300 transition-all cursor-pointer group flex flex-col justify-between"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
-                  Mídia & Campanhas
-                </span>
-                <div className="p-2 bg-purple-50 text-purple-600 rounded-lg group-hover:scale-105 transition-transform">
-                  <Megaphone className="w-5 h-5" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between items-baseline">
-                  <span className="text-xs text-gray-500">Investimento (Meta):</span>
-                  <span className="text-xs font-bold text-[#373535]">
-                    {metaTotals.totalSpend > 0
-                      ? formatCurrency(metaTotals.totalSpend)
-                      : metaConfig?.status === 'conectado'
-                      ? 'R$ 0,00'
-                      : metaConfig?.ad_account_id
-                      ? 'IDs salvos (Token pendente)'
-                      : 'Sem conexão'}
-                  </span>
-                </div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-xs text-gray-500">Cadastros gerados:</span>
-                  <span className="text-xs font-semibold text-red-600">
-                    {metaTotals.totalLeads > 0
-                      ? `${metaTotals.totalLeads} leads`
-                      : metaConfig?.status === 'conectado'
-                      ? '0 leads'
-                      : 'Aguardando dados'}
-                  </span>
-                </div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-xs text-gray-500">Custo por lead (CPL):</span>
-                  <span className="text-xs font-semibold text-gray-700">
-                    {metaTotals.avgCostPerLead !== null
-                      ? formatCurrency(metaTotals.avgCostPerLead)
-                      : '-'}
-                  </span>
-                </div>
-              </div>
+          {/* Bloco 1: Performance Financeira Analítica */}
+          {canViewFinancial ? (
+            <FinancialAnalyticsSection
+              data={dashboardData.financial}
+              onNavigateToFinancial={() => onNavigate('financeiro')}
+            />
+          ) : (
+            <div className="p-5 bg-white rounded-2xl border border-gray-200 text-center text-xs text-gray-400">
+              Módulo Financeiro restrito às suas permissões de acesso.
             </div>
-            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-[#DE3A39]">
-              <span>Ver Campanhas</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </div>
-        )}
+          )}
 
-        {/* Card: Leads e Imobiliárias */}
-        {hasAccess('imobiliarias') && (
-          <div
-            onClick={() => onNavigate('imobiliarias')}
-            className="bg-white rounded-xl p-5 border border-gray-200 shadow-xs hover:shadow-md hover:border-gray-300 transition-all cursor-pointer group flex flex-col justify-between"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
-                  Leads & Imobiliárias
-                </span>
-                <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg group-hover:scale-105 transition-transform">
-                  <Building2 className="w-5 h-5" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between items-baseline">
-                  <span className="text-xs text-gray-500">Integração CVCRM:</span>
-                  <span className={`text-xs font-bold ${
-                    cvcrmConfig?.status === 'conectado'
-                      ? 'text-emerald-600'
-                      : 'text-amber-600'
-                  }`}>
-                    {cvcrmConfig?.status === 'conectado' ? 'Conectado' : 'Aguardando Token'}
-                  </span>
-                </div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-xs text-gray-500">Leads distribuídos:</span>
-                  <span className="text-xs font-bold text-[#373535]">
-                    {imobiliariaTotals.leads > 0 ? `${imobiliariaTotals.leads} leads` : '0 leads'}
-                  </span>
-                </div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-xs text-gray-500">Vendas / Conversão:</span>
-                  <span className="text-xs font-bold text-emerald-600">
-                    {imobiliariaTotals.sales} ({imobiliariaTotals.conversionRate.toFixed(1)}%)
-                  </span>
-                </div>
-              </div>
+          {/* Bloco 2: Leads & Funil Comercial do CVCRM (Fila TOP 5) */}
+          {canViewLeads ? (
+            <LeadsAnalyticsSection
+              data={dashboardData.leads}
+              onNavigateToLeads={() => onNavigate('imobiliarias')}
+            />
+          ) : (
+            <div className="p-5 bg-white rounded-2xl border border-gray-200 text-center text-xs text-gray-400">
+              Módulo de Leads e Imobiliárias restrito às suas permissões de acesso.
             </div>
-            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-[#DE3A39]">
-              <span>Ver Imobiliárias</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </div>
-        )}
-      </div>
+          )}
+
+          {/* Bloco 3: Eficiência de Mídia e Custo de Aquisição (CPL / CAC) */}
+          {canViewMedia && (
+            <MediaEfficiencySection
+              data={dashboardData.media}
+              onNavigateToMedia={() => onNavigate('midia')}
+            />
+          )}
+
+          {/* Bloco 4: Visão Operacional (Pautas de Conteúdo & Calendário Oficial) */}
+          {(canViewContent || canViewCalendar) && (
+            <OperationalQuickSection
+              data={dashboardData.operational}
+              onNavigateToContent={() => onNavigate('conteudos')}
+              onNavigateToCalendar={() => onNavigate('calendario')}
+            />
+          )}
+        </div>
+      ) : null}
     </div>
   );
 };
